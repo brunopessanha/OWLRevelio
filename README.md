@@ -1,2 +1,2 @@
-# ReveliOWL
-Translates SysML Diagrams into OWL Ontology
+# OWLRevelio
+Translates SysML Internal Block Diagrams into OWL Ontology
