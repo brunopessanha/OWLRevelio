@@ -1,16 +1,17 @@
 import org.junit.Before;
 import org.junit.Test;
+import uni.tukl.cs.cps.revelio.Revelio;
 
 import static org.junit.Assert.*;
 
-public class ReveliOWLParserTest {
+public class RevelioTest {
 
     private String sysMLFilePath = "resources/samples/block_diagram.xml";
-    private ReveliOWLParser revelio;
+    private Revelio revelio;
 
     @Before
     public void setUp() throws Exception {
-        revelio = new ReveliOWLParser(sysMLFilePath);
+        revelio = new Revelio(sysMLFilePath);
     }
 
     @Test
