@@ -2,21 +2,13 @@ package uni.tukl.cs.cps.revelio.sysML;
 
 public class SysMLTag  {
 
-    private String baseClass;
+    private String base;
 
     private String tagName;
 
-    public SysMLTag (String tagName, String baseClass) {
+    public SysMLTag (String tagName, String base) {
         this.tagName = tagName;
-        this.baseClass = baseClass;
-    }
-
-    public String getBaseClass() {
-        return baseClass;
-    }
-
-    public void setBaseClass(String baseClass) {
-        this.baseClass = baseClass;
+        this.base = base;
     }
 
     public String getTagName() {
@@ -25,5 +17,13 @@ public class SysMLTag  {
 
     public void setTagName(String tagName) {
         this.tagName = tagName;
+    }
+
+    public String getBase() {
+        return base;
+    }
+
+    public void setBase(String base) {
+        this.base = base;
     }
 }

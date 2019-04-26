@@ -5,7 +5,9 @@ public class Enums {
     public enum XML_Tag {
         XMI("xmi:XMI"),
         BlockDiagram("Blocks:Block"),
+        ParticipantProperty("Blocks:ParticipantProperty"),
         PackagedElement("packagedElement"),
+        OwnedAttribute("ownedAttribute"),
         OwnedEnd("ownedEnd");
 
         private String tagName;
@@ -25,6 +27,7 @@ public class Enums {
         XMI_ID("xmi:id"),
         XMI_Type("xmi:type"),
         BaseClass("base_Class"),
+        BaseProperty("base_Property"),
         Name("name"),
         Aggregation("aggregation"),
         Type("type");
@@ -46,7 +49,9 @@ public class Enums {
 
         UML_Class ("uml:Class"),
         UML_Association("uml:Association"),
-        UML_Property("uml:Property");
+        UML_Property("uml:Property"),
+        UML_Generalization("uml:Generalization"),
+        UML_DataType("uml:DataType");
 
         private String type;
 

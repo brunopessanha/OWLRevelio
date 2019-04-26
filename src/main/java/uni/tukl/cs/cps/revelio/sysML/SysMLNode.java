@@ -14,9 +14,11 @@ public abstract class SysMLNode {
     protected String type;
 
     protected String getAttributeValue(NamedNodeMap attributes, String attributeId) {
-        Node attribute = attributes.getNamedItem(attributeId);
-        if (attribute != null) {
-            return attribute.getNodeValue();
+        if (attributes != null) {
+            Node attribute = attributes.getNamedItem(attributeId);
+            if (attribute != null) {
+                return attribute.getNodeValue();
+            }
         }
         return null;
     }

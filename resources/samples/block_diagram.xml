@@ -7,8 +7,16 @@
     <packageImport xmi:type="uml:PackageImport" xmi:id="_VZCzgGdNEemtVcDczo78AQ">
       <importedPackage xmi:type="uml:Package" href="pathmap://SysML14_LIBRARIES/SysML-Standard-Library.uml#SysML.package_packagedElement_Libraries"/>
     </packageImport>
-    <packagedElement xmi:type="uml:Class" xmi:id="_r-FGsGdNEemtVcDczo78AQ" name="Vehicle"/>
-    <packagedElement xmi:type="uml:Class" xmi:id="_x-X1MGdNEemtVcDczo78AQ" name="Engine"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_r-FGsGdNEemtVcDczo78AQ" name="Vehicle">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_Xd07YGghEemtVcDczo78AQ" name="Name">
+        <type xmi:type="uml:DataType" href="pathmap://SysML14_LIBRARIES/SysML-Standard-Library.uml#SysML.package_packagedElement_Libraries.package_packagedElement_PrimitiveValueTypes.dataType_packagedElement_String"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_x-X1MGdNEemtVcDczo78AQ" name="Engine">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_4KMOcGgiEemtVcDczo78AQ" name="Power">
+        <type xmi:type="uml:DataType" href="pathmap://SysML14_LIBRARIES/SysML-Standard-Library.uml#SysML.package_packagedElement_Libraries.package_packagedElement_PrimitiveValueTypes.dataType_packagedElement_Real"/>
+      </ownedAttribute>
+    </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_zsBCwGdNEemtVcDczo78AQ" name="FuelSystem"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_1fbhIGdNEemtVcDczo78AQ" name="Frame"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_7NKgAGdNEemtVcDczo78AQ" name="Pump"/>
@@ -50,6 +58,9 @@
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_nCObQGdOEemtVcDczo78AQ" value="2"/>
       </ownedEnd>
       <ownedEnd xmi:type="uml:Property" xmi:id="_khp78GdOEemtVcDczo78AQ" name="fuelsystem" type="_zsBCwGdNEemtVcDczo78AQ" association="_khot0GdOEemtVcDczo78AQ"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_zedfIGgiEemtVcDczo78AQ" name="MySpecialEngine">
+      <generalization xmi:type="uml:Generalization" xmi:id="_0ewegGgiEemtVcDczo78AQ" general="_x-X1MGdNEemtVcDczo78AQ"/>
     </packagedElement>
     <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_VYUawGdNEemtVcDczo78AQ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_VYZ6UGdNEemtVcDczo78AQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
@@ -118,4 +129,7 @@
   <Blocks:Block xmi:id="_1fhAsGdNEemtVcDczo78AQ" base_Class="_1fbhIGdNEemtVcDczo78AQ"/>
   <Blocks:Block xmi:id="_7NOxcGdNEemtVcDczo78AQ" base_Class="_7NKgAGdNEemtVcDczo78AQ"/>
   <Blocks:Block xmi:id="_8mTdMGdNEemtVcDczo78AQ" base_Class="_8mPLwGdNEemtVcDczo78AQ"/>
+  <Blocks:ParticipantProperty xmi:id="_Xd_6gGghEemtVcDczo78AQ" base_Property="_Xd07YGghEemtVcDczo78AQ"/>
+  <Blocks:Block xmi:id="_zehwkGgiEemtVcDczo78AQ" base_Class="_zedfIGgiEemtVcDczo78AQ"/>
+  <Blocks:ParticipantProperty xmi:id="_4KS8IGgiEemtVcDczo78AQ" base_Property="_4KMOcGgiEemtVcDczo78AQ"/>
 </xmi:XMI>

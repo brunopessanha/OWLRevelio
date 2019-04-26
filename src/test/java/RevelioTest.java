@@ -16,6 +16,6 @@ public class RevelioTest {
 
     @Test
     public void GetClassesTest() {
-        assertEquals(revelio.GetClasses().size(), 6);
+        assertEquals(revelio.GetClasses().size(), 7);
     }
 }

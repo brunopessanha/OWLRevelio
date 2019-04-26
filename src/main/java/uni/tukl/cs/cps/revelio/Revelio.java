@@ -14,7 +14,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,6 +25,7 @@ public class Revelio implements SysML2OWLParser {
 
     private String ontologyPrefix;
     private Map<String, Block> blockMap;
+    private Map<String, ParticipantProperty> propertyMap;
     private List<Association> associations;
 
     private List<OWLClass> classes;
@@ -38,6 +38,7 @@ public class Revelio implements SysML2OWLParser {
         this.ontologyManager = OWLManager.createOWLOntologyManager();
         this.dataFactory = ontologyManager.getOWLDataFactory();
         this.ontologyPrefix = ontologyPrefix;
+        this.associations = new ArrayList<>();
 
         Document doc = null;
 
@@ -58,24 +59,36 @@ public class Revelio implements SysML2OWLParser {
     private void parseBlockDiagram(Document doc) {
 
         blockMap = parseNodesByTag(doc, Enums.XML_Tag.BlockDiagram.toString()).stream()
-                .map(t -> new Block(t.getBaseClass())).collect(Collectors.toMap(Block::getId, block -> block));
+                .map(t -> new Block(t.getBase())).collect(Collectors.toMap(Block::getId, block -> block));
+
+        propertyMap = parseNodesByTag(doc, Enums.XML_Tag.ParticipantProperty.toString()).stream()
+                .map(t -> new ParticipantProperty(t.getBase())).collect(Collectors.toMap(ParticipantProperty::getId, property -> property));
 
         NodeList packagedElements = doc.getElementsByTagName(Enums.XML_Tag.PackagedElement.toString());
         for (int i = 0; i < packagedElements.getLength(); i++) {
 
-            PackagedElement packagedElement = new PackagedElement(packagedElements.item(i).getAttributes());
+            PackagedElement packagedElement = new PackagedElement(packagedElements.item(i).getAttributes(), packagedElements.item(i).getChildNodes());
 
             if (packagedElement.getType().equals(Enums.XMI_Type.UML_Class.toString()) && blockMap.containsKey(packagedElement.getId())) {
-                setBlockName(packagedElement);
+                parseBlock(packagedElement);
             } else if (packagedElement.getType().equals(Enums.XMI_Type.UML_Association.toString())) {
-                associations = parseAssociations(packagedElements.item(i).getChildNodes(), packagedElement);
+                associations.addAll(parseAssociation(packagedElement));
             }
         }
     }
 
-    private void setBlockName(PackagedElement packagedElement) {
+    private void parseBlock(PackagedElement packagedElement) {
         Block block = blockMap.get(packagedElement.getId());
         block.setName(packagedElement.getName());
+
+        for (int i = 0; i < packagedElement.getChildNodes().getLength(); i++) {
+            OwnedAttribute attribute = new OwnedAttribute(packagedElement.getChildNodes().item(i).getAttributes());
+            if (attribute.getXmiType() != null && attribute.getXmiType().equals(Enums.XMI_Type.UML_Property.toString())) {
+                ParticipantProperty property = propertyMap.get(attribute.getId());
+                property.setName(attribute.getName());
+                block.getAttributes().add(attribute);
+            }
+        }
 
         System.out.println("Block Name: " + block.getName());
     }
@@ -84,26 +97,33 @@ public class Revelio implements SysML2OWLParser {
         NodeList nodeBlocks = doc.getElementsByTagName(tagName);
         List<SysMLTag> tags = new ArrayList<>();
         for (int i = 0; i < nodeBlocks.getLength(); i++) {
-            SysMLTag tag = new SysMLTag(tagName, nodeBlocks.item(i).getAttributes().getNamedItem(Enums.XML_Attribute.BaseClass.toString()).getNodeValue());
-            tags.add(tag);
+            SysMLTag tag = null;
+            if (tagName.equals(Enums.XML_Tag.BlockDiagram.toString())) {
+                tag = new SysMLTag(tagName, nodeBlocks.item(i).getAttributes().getNamedItem(Enums.XML_Attribute.BaseClass.toString()).getNodeValue());
+            } else if (tagName.equals(Enums.XML_Tag.ParticipantProperty.toString())) {
+                tag = new SysMLTag(tagName, nodeBlocks.item(i).getAttributes().getNamedItem(Enums.XML_Attribute.BaseProperty.toString()).getNodeValue());
+            }
+            if (tag != null) {
+                tags.add(tag);
+            }
         }
         return tags;
     }
 
-    private List<Association> parseAssociations(NodeList ownedEnds, PackagedElement packagedElement) {
+    private List<Association> parseAssociation(PackagedElement packagedElement) {
         OwnedEnd owner = null;
         OwnedEnd owned = null;
 
         List<Association> umlAssociations = new ArrayList<>();
 
         boolean foundPart = false;
-        for (int j = 0; j < ownedEnds.getLength() && owner == null; j++) {
-            if (ownedEnds.item(j).getNodeName().equals(Enums.XML_Tag.OwnedEnd.toString())) {
+        for (int i = 0; i < packagedElement.getChildNodes().getLength() && owner == null; i++) {
+            if (packagedElement.getChildNodes().item(i).getNodeName().equals(Enums.XML_Tag.OwnedEnd.toString())) {
                 if (!foundPart) {
                     foundPart = true;
-                    owned = new OwnedEnd(ownedEnds.item(j).getAttributes());
+                    owned = new OwnedEnd(packagedElement.getChildNodes().item(i).getAttributes());
                 } else {
-                    owner = new OwnedEnd(ownedEnds.item(j).getAttributes());
+                    owner = new OwnedEnd(packagedElement.getChildNodes().item(i).getAttributes());
                     Association association = new Association(packagedElement, owner, owned);
                     umlAssociations.add(association);
 
@@ -120,7 +140,7 @@ public class Revelio implements SysML2OWLParser {
     public List<OWLClass> GetClasses() {
         if (classes == null) {
             classes = new ArrayList<>();
-            for (Block block: blockMap.values()) {
+            for (Block block : blockMap.values()) {
                 IRI iri = IRI.create(ontologyPrefix, block.getName());
                 OWLClass owlClass = dataFactory.getOWLClass(iri);
                 classes.add(owlClass);
