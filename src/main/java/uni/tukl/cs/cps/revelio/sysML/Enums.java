@@ -1,4 +1,4 @@
-package uni.tukl.cs.cps.revelio;
+package uni.tukl.cs.cps.revelio.sysML;
 
 public class Enums {
 

@@ -1,4 +1,4 @@
-package uni.tukl.cs.cps.revelio.Exceptions;
+package uni.tukl.cs.cps.revelio.exceptions;
 
 import java.io.IOException;
 

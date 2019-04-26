@@ -11,11 +11,11 @@ public class RevelioTest {
 
     @Before
     public void setUp() throws Exception {
-        revelio = new Revelio(sysMLFilePath);
+        revelio = new Revelio(sysMLFilePath, "http://www.semanticweb.org/revelio/test-ontology");
     }
 
     @Test
-    public void GetClassAxiomsTest() {
-        assertEquals(revelio.GetClassAxioms().size(), 0);
+    public void GetClassesTest() {
+        assertEquals(revelio.GetClasses().size(), 6);
     }
 }

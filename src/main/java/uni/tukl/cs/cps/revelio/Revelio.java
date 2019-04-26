@@ -1,11 +1,12 @@
 package uni.tukl.cs.cps.revelio;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import uni.tukl.cs.cps.revelio.Exceptions.InvalidSysMLFileException;
+import uni.tukl.cs.cps.revelio.exceptions.InvalidSysMLFileException;
+import uni.tukl.cs.cps.revelio.sysML.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,22 +17,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Revelio implements SysML2OWLParser {
 
-    private String filePath;
+    private final OWLDataFactory dataFactory;
+    private final OWLOntologyManager ontologyManager;
 
-    private List<OWLClassAxiom> classAxioms;
-    private List<OWLObjectPropertyAxiom> objectPropertyAxioms;
-    private List<OWLDataPropertyAxiom> dataPropertyAxioms;
-    private List<OWLIndividualAxiom> individualAxioms;
+    private String ontologyPrefix;
+    private Map<String, Block> blockMap;
+    private List<Association> associations;
 
-    public Revelio(String filePath) throws InvalidSysMLFileException {
-        this.filePath = filePath;
-        this.classAxioms = new ArrayList<>();
-        this.objectPropertyAxioms = new ArrayList<>();
-        this.dataPropertyAxioms = new ArrayList<>();
-        this.individualAxioms = new ArrayList<>();
+    private List<OWLClass> classes;
+    private List<OWLObjectProperty> objectProperties;
+    private List<OWLDataProperty> dataProperties;
+    private List<OWLIndividual> individuals;
+
+    public Revelio(String filePath, String ontologyPrefix) throws InvalidSysMLFileException {
+
+        this.ontologyManager = OWLManager.createOWLOntologyManager();
+        this.dataFactory = ontologyManager.getOWLDataFactory();
+        this.ontologyPrefix = ontologyPrefix;
 
         Document doc = null;
 
@@ -39,92 +45,102 @@ public class Revelio implements SysML2OWLParser {
             File file = new File(filePath);
             DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             doc = dBuilder.parse(file);
-        } catch (ParserConfigurationException pcEx) {
-            throw new InvalidSysMLFileException(pcEx);
-        } catch (IOException ioEx) {
-            throw new InvalidSysMLFileException(ioEx);
-        } catch (SAXException saxEx) {
-            throw new InvalidSysMLFileException(saxEx);
-        }
-
-        if (doc != null) {
-
             if(!doc.getDocumentElement().getNodeName().equals(Enums.XML_Tag.XMI.toString())) {
                 throw new InvalidSysMLFileException("The file provided is not a valid XMI file.");
             }
+            parseBlockDiagram(doc);
 
-            parseSysMLBlockDiagram(doc);
+        } catch (ParserConfigurationException | IOException | SAXException ex) {
+            throw new InvalidSysMLFileException(ex);
         }
     }
 
-    private void parseSysMLBlockDiagram(Document doc) {
+    private void parseBlockDiagram(Document doc) {
 
-        Map<String, SysMLBlock> blockMap = new HashMap<>();
-        NodeList nodeBlocks = doc.getElementsByTagName(Enums.XML_Tag.BlockDiagram.toString());
-        for (int i = 0; i < nodeBlocks.getLength(); i++) {
-            SysMLBlock block = new SysMLBlock();
-            block.setId(nodeBlocks.item(i).getAttributes().getNamedItem(Enums.XML_Attribute.BaseClass.toString()).getNodeValue());
-            blockMap.put(block.getId(), block);
-        }
+        blockMap = parseNodesByTag(doc, Enums.XML_Tag.BlockDiagram.toString()).stream()
+                .map(t -> new Block(t.getBaseClass())).collect(Collectors.toMap(Block::getId, block -> block));
 
         NodeList packagedElements = doc.getElementsByTagName(Enums.XML_Tag.PackagedElement.toString());
         for (int i = 0; i < packagedElements.getLength(); i++) {
 
-            NamedNodeMap attributes = packagedElements.item(i).getAttributes();
-            String id = attributes.getNamedItem(Enums.XML_Attribute.XMI_ID.toString()).getNodeValue();
-            String type = attributes.getNamedItem(Enums.XML_Attribute.XMI_Type.toString()).getNodeValue();
-            String name = attributes.getNamedItem(Enums.XML_Attribute.Name.toString()).getNodeValue();
+            PackagedElement packagedElement = new PackagedElement(packagedElements.item(i).getAttributes());
 
-            if (type.equals(Enums.XMI_Type.UML_Class.toString()) && blockMap.containsKey(id)) {
-
-                SysMLBlock block = blockMap.get(id);
-                block.setName(name);
-                System.out.println("Block Name: " + block.getName());
-
-            } else if (type.equals(Enums.XMI_Type.UML_Association.toString())) {
-
-                NodeList ownedEnds = packagedElements.item(i).getChildNodes();
-
-                boolean foundPart = false;
-                String partOfId = "";
-                String aggregation = "";
-                String partId = "";
-
-                for (int j = 0; j < ownedEnds.getLength(); j++) {
-                    if (ownedEnds.item(j).getNodeName().equals(Enums.XML_Tag.OwnedEnd.toString())) {
-                        if (!foundPart) {
-                            partId = ownedEnds.item(j).getAttributes().getNamedItem(Enums.XML_Attribute.Type.toString()).getNodeValue();
-                            aggregation = ownedEnds.item(j).getAttributes().getNamedItem(Enums.XML_Attribute.Aggregation.toString()).getNodeValue();
-                            foundPart = true;
-                        } else {
-                            partOfId = ownedEnds.item(j).getAttributes().getNamedItem(Enums.XML_Attribute.Type.toString()).getNodeValue();
-                            break;
-                        }
-                    }
-                }
-
-                System.out.println("Association (" + aggregation + "): " + name + " -> " + blockMap.get(partOfId).getName() + " hasPart " + blockMap.get(partId).getName());
+            if (packagedElement.getType().equals(Enums.XMI_Type.UML_Class.toString()) && blockMap.containsKey(packagedElement.getId())) {
+                setBlockName(packagedElement);
+            } else if (packagedElement.getType().equals(Enums.XMI_Type.UML_Association.toString())) {
+                associations = parseAssociations(packagedElements.item(i).getChildNodes(), packagedElement);
             }
         }
     }
 
-    @Override
-    public List<OWLClassAxiom> GetClassAxioms() {
-        return classAxioms;
+    private void setBlockName(PackagedElement packagedElement) {
+        Block block = blockMap.get(packagedElement.getId());
+        block.setName(packagedElement.getName());
+
+        System.out.println("Block Name: " + block.getName());
+    }
+
+    private List<SysMLTag> parseNodesByTag(Document doc, String tagName) {
+        NodeList nodeBlocks = doc.getElementsByTagName(tagName);
+        List<SysMLTag> tags = new ArrayList<>();
+        for (int i = 0; i < nodeBlocks.getLength(); i++) {
+            SysMLTag tag = new SysMLTag(tagName, nodeBlocks.item(i).getAttributes().getNamedItem(Enums.XML_Attribute.BaseClass.toString()).getNodeValue());
+            tags.add(tag);
+        }
+        return tags;
+    }
+
+    private List<Association> parseAssociations(NodeList ownedEnds, PackagedElement packagedElement) {
+        OwnedEnd owner = null;
+        OwnedEnd owned = null;
+
+        List<Association> umlAssociations = new ArrayList<>();
+
+        boolean foundPart = false;
+        for (int j = 0; j < ownedEnds.getLength() && owner == null; j++) {
+            if (ownedEnds.item(j).getNodeName().equals(Enums.XML_Tag.OwnedEnd.toString())) {
+                if (!foundPart) {
+                    foundPart = true;
+                    owned = new OwnedEnd(ownedEnds.item(j).getAttributes());
+                } else {
+                    owner = new OwnedEnd(ownedEnds.item(j).getAttributes());
+                    Association association = new Association(packagedElement, owner, owned);
+                    umlAssociations.add(association);
+
+                    System.out.println("Association (" + association.getOwned().getAggregation() + "): " + association.getName() + " -> "
+                            + blockMap.get(association.getOwner().getType()).getName() + " hasPart " + blockMap.get(association.getOwned().getType()).getName());
+                }
+            }
+        }
+
+        return umlAssociations;
     }
 
     @Override
-    public List<OWLObjectPropertyAxiom> GetObjectPropertyAxioms() {
-        return objectPropertyAxioms;
+    public List<OWLClass> GetClasses() {
+        if (classes == null) {
+            classes = new ArrayList<>();
+            for (Block block: blockMap.values()) {
+                IRI iri = IRI.create(ontologyPrefix, block.getName());
+                OWLClass owlClass = dataFactory.getOWLClass(iri);
+                classes.add(owlClass);
+            }
+        }
+        return classes;
     }
 
     @Override
-    public List<OWLDataPropertyAxiom> GetDataPropertyAxioms() {
-        return dataPropertyAxioms;
+    public List<OWLObjectProperty> GetObjectProperties() {
+        return objectProperties;
     }
 
     @Override
-    public List<OWLIndividualAxiom> GetIndividualAxioms() {
-        return individualAxioms;
+    public List<OWLDataProperty> GetDataProperties() {
+        return dataProperties;
+    }
+
+    @Override
+    public List<OWLIndividual> GetIndividuals() {
+        return individuals;
     }
 }
