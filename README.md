@@ -1,2 +1,3 @@
 # OWLRevelio
-Translates SysML Internal Block Diagrams into OWL Ontology
+Translates restriced SysML Block Diagrams & Internal Block Diagrams into OWL Ontology
+
