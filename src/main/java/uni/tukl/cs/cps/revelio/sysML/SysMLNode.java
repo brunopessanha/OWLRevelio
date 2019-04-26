@@ -3,7 +3,7 @@ package uni.tukl.cs.cps.revelio.sysML;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-public abstract class SysMLNode {
+public class SysMLNode {
 
     protected String tag;
 
@@ -12,6 +12,19 @@ public abstract class SysMLNode {
     protected String name;
 
     protected String type;
+
+    protected String xmiType;
+
+    public SysMLNode() {
+
+    }
+
+    public SysMLNode(NamedNodeMap attributes) {
+        this.id = getAttributeValue(attributes, Enums.XML_Attribute.XMI_ID.toString());
+        this.name = getAttributeValue(attributes, Enums.XML_Attribute.Name.toString());
+        this.type = getAttributeValue(attributes, Enums.XML_Attribute.Type.toString());
+        this.xmiType = getAttributeValue(attributes, Enums.XML_Attribute.XMI_Type.toString());
+    }
 
     protected String getAttributeValue(NamedNodeMap attributes, String attributeId) {
         if (attributes != null) {
@@ -53,5 +66,13 @@ public abstract class SysMLNode {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public String getXmiType() {
+        return xmiType;
+    }
+
+    public void setXmiType(String xmiType) {
+        this.xmiType = xmiType;
     }
 }

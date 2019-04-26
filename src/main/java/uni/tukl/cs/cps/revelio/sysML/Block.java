@@ -7,8 +7,11 @@ public class Block extends SysMLNode {
 
     private List<OwnedAttribute> attributes;
 
-    public Block(String id) {
+    private String superClass;
+
+    public Block(String id, String superClass) {
         this.id = id;
+        this.superClass = superClass;
         this.attributes = new ArrayList<>();
     }
 
@@ -18,5 +21,13 @@ public class Block extends SysMLNode {
 
     public void setAttributes(List<OwnedAttribute> attributes) {
         this.attributes = attributes;
+    }
+
+    public String getSuperClass() {
+        return superClass;
+    }
+
+    public void setSuperClass(String superClass) {
+        this.superClass = superClass;
     }
 }

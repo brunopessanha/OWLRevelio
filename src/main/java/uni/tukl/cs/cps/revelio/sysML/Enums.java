@@ -30,6 +30,7 @@ public class Enums {
         BaseProperty("base_Property"),
         Name("name"),
         Aggregation("aggregation"),
+        General("general"),
         Type("type");
 
         private String attributeName;

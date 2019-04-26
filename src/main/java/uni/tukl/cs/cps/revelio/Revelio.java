@@ -23,6 +23,7 @@ public class Revelio implements SysML2OWLParser {
     private final OWLDataFactory dataFactory;
     private final OWLOntologyManager ontologyManager;
 
+    private String rootClass;
     private String ontologyPrefix;
     private Map<String, Block> blockMap;
     private Map<String, ParticipantProperty> propertyMap;
@@ -33,12 +34,13 @@ public class Revelio implements SysML2OWLParser {
     private List<OWLDataProperty> dataProperties;
     private List<OWLIndividual> individuals;
 
-    public Revelio(String filePath, String ontologyPrefix) throws InvalidSysMLFileException {
+    public Revelio(String filePath, String ontologyPrefix, String rootClass) throws InvalidSysMLFileException {
 
         this.ontologyManager = OWLManager.createOWLOntologyManager();
         this.dataFactory = ontologyManager.getOWLDataFactory();
         this.ontologyPrefix = ontologyPrefix;
         this.associations = new ArrayList<>();
+        this.rootClass = rootClass;
 
         Document doc = null;
 
@@ -59,7 +61,7 @@ public class Revelio implements SysML2OWLParser {
     private void parseBlockDiagram(Document doc) {
 
         blockMap = parseNodesByTag(doc, Enums.XML_Tag.BlockDiagram.toString()).stream()
-                .map(t -> new Block(t.getBase())).collect(Collectors.toMap(Block::getId, block -> block));
+                .map(t -> new Block(t.getBase(), this.rootClass)).collect(Collectors.toMap(Block::getId, block -> block));
 
         propertyMap = parseNodesByTag(doc, Enums.XML_Tag.ParticipantProperty.toString()).stream()
                 .map(t -> new ParticipantProperty(t.getBase())).collect(Collectors.toMap(ParticipantProperty::getId, property -> property));
@@ -82,15 +84,20 @@ public class Revelio implements SysML2OWLParser {
         block.setName(packagedElement.getName());
 
         for (int i = 0; i < packagedElement.getChildNodes().getLength(); i++) {
-            OwnedAttribute attribute = new OwnedAttribute(packagedElement.getChildNodes().item(i).getAttributes());
-            if (attribute.getXmiType() != null && attribute.getXmiType().equals(Enums.XMI_Type.UML_Property.toString())) {
-                ParticipantProperty property = propertyMap.get(attribute.getId());
-                property.setName(attribute.getName());
-                block.getAttributes().add(attribute);
+            SysMLNode childNode = new SysMLNode(packagedElement.getChildNodes().item(i).getAttributes());
+            if (childNode.getXmiType() != null) {
+                if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Property.toString())) {
+                    propertyMap.get(childNode.getId()).setName(childNode.getName());
+                    block.getAttributes().add(new OwnedAttribute(childNode));
+                } else if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Generalization.toString())) {
+                    Generalization generalization = new Generalization(childNode);
+                    generalization.setGeneral(packagedElement.getChildNodes().item(i).getAttributes().getNamedItem(Enums.XML_Attribute.General.toString()).getNodeValue());
+                    block.setSuperClass(blockMap.get(generalization.getGeneral()).getName());
+                }
             }
         }
 
-        System.out.println("Block Name: " + block.getName());
+        System.out.println("Block Name: " + block.getName() + " Super class: " + block.getSuperClass());
     }
 
     private List<SysMLTag> parseNodesByTag(Document doc, String tagName) {

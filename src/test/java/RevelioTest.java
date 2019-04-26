@@ -11,7 +11,7 @@ public class RevelioTest {
 
     @Before
     public void setUp() throws Exception {
-        revelio = new Revelio(sysMLFilePath, "http://www.semanticweb.org/revelio/test-ontology");
+        revelio = new Revelio(sysMLFilePath, "http://www.semanticweb.org/revelio/test-ontology", "Part");
     }
 
     @Test
