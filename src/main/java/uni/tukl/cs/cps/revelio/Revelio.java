@@ -120,9 +120,9 @@ public class Revelio implements SysML2OWLParser {
             if (packagedElement.getChildNodes().item(i).getNodeName().equals(Enums.XML_Tag.OwnedEnd.toString())) {
                 if (!foundPart) {
                     foundPart = true;
-                    owned = new OwnedEnd(packagedElement.getChildNodes().item(i).getAttributes());
+                    owned = new OwnedEnd(packagedElement.getChildNodes().item(i));
                 } else {
-                    owner = new OwnedEnd(packagedElement.getChildNodes().item(i).getAttributes());
+                    owner = new OwnedEnd(packagedElement.getChildNodes().item(i));
                     Association association = new Association(packagedElement, owner, owned);
                     umlAssociations.add(association);
 

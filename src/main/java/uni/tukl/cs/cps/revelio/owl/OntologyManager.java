@@ -5,6 +5,8 @@ import org.semanticweb.owlapi.model.*;
 import uni.tukl.cs.cps.revelio.Revelio;
 import uni.tukl.cs.cps.revelio.sysML.Association;
 import uni.tukl.cs.cps.revelio.sysML.Block;
+import uni.tukl.cs.cps.revelio.sysML.Enums;
+import uni.tukl.cs.cps.revelio.sysML.OwnedEnd;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -67,11 +69,12 @@ public class OntologyManager {
             }
 
             for (Association association : revelio.getAssociations()) {
+
                 OWLClass owlOwnerClass = getOWLClass(revelio.getBlockMap().get(association.getOwner().getType()).getName());
                 OWLClass owlOwnedClass = getOWLClass(revelio.getBlockMap().get(association.getOwned().getType()).getName());
 
-                OWLObjectProperty hasPartRelation = dataFactory.getOWLObjectProperty(getIRI("hasPart"));
-                OWLClassExpression classExpression = dataFactory.getOWLObjectSomeValuesFrom(hasPartRelation, owlOwnedClass);
+                OWLObjectProperty hasPartRelation = dataFactory.getOWLObjectProperty(getIRI(Enums.Association.HasPart.toString()));
+                OWLClassExpression classExpression = getOWLClassExpression(association, owlOwnedClass, hasPartRelation);
 
                 OWLClassAxiom axiom = dataFactory.getOWLSubClassOfAxiom(owlOwnerClass, classExpression);
 
@@ -80,6 +83,31 @@ public class OntologyManager {
         }
 
         return classAxioms.stream();
+    }
+
+    private OWLClassExpression getOWLClassExpression(Association association, OWLClass owlOwnedClass, OWLObjectProperty hasPartRelation) {
+        OWLClassExpression classExpression;
+
+        if (association.hasExactCardinalityRestriction()) {
+
+            int cardinality = Integer.parseInt(association.getOwned().getLowerValue().getValue());
+            classExpression = dataFactory.getOWLObjectExactCardinality(cardinality, hasPartRelation, owlOwnedClass);
+
+        } else if (association.hasMinCardinalityRestriction()) {
+
+            int cardinality = Integer.parseInt(association.getOwned().getLowerValue().getValue());
+            classExpression = dataFactory.getOWLObjectMinCardinality(cardinality, hasPartRelation, owlOwnedClass);
+
+        } else if (association.hasMaxCardinalityRestriction()) {
+
+            int cardinality = Integer.parseInt(association.getOwned().getUpperValue().getValue());
+            classExpression = dataFactory.getOWLObjectMaxCardinality(cardinality, hasPartRelation, owlOwnedClass);
+        } else {
+
+            classExpression = dataFactory.getOWLObjectSomeValuesFrom(hasPartRelation, owlOwnedClass);
+        }
+
+        return classExpression;
     }
 
     public Stream<OWLObjectPropertyAxiom> objectPropertyAxioms() {

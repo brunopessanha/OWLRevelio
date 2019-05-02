@@ -32,4 +32,44 @@ public class Association extends SysMLNode {
     public void setOwned(OwnedEnd owned) {
         this.owned = owned;
     }
+
+    public boolean hasExactCardinalityRestriction() {
+        if (owned == null || owned.getLowerValue() == null || owned.getUpperValue() == null)
+            return  false;
+
+        if ((owned.getUpperValue().getXmiType().equals(Enums.XMI_Type.UML_LiteralInteger.toString()) || owned.getUpperValue().getXmiType().equals(Enums.XMI_Type.UML_LiteralUnlimitedNatural.toString()))
+                && (owned.getLowerValue().getXmiType().equals(Enums.XMI_Type.UML_LiteralInteger.toString()) || owned.getLowerValue().getXmiType().equals(Enums.XMI_Type.UML_LiteralUnlimitedNatural.toString()))) {
+            try {
+                return Integer.parseInt(owned.getLowerValue().getValue()) == Integer.parseInt(owned.getUpperValue().getValue());
+            } catch (Exception ex) { }
+        }
+
+        return false;
+    }
+
+    public boolean hasMinCardinalityRestriction() {
+        if (owned == null || owned.getLowerValue() == null || owned.getUpperValue() == null)
+            return  false;
+
+        if (owned.getUpperValue().getXmiType().equals(Enums.XMI_Type.UML_LiteralUnlimitedNatural.toString()) && owned.getLowerValue().getXmiType().equals(Enums.XMI_Type.UML_LiteralInteger.toString())) {
+            try {
+                return Integer.parseInt(owned.getLowerValue().getValue()) > 0 && owned.getUpperValue().getValue().equals("*");
+            } catch (Exception ex) { }
+        }
+
+        return false;
+    }
+
+    public boolean hasMaxCardinalityRestriction() {
+        if (owned == null || owned.getLowerValue() == null || owned.getUpperValue() == null)
+            return  false;
+
+        if (owned.getUpperValue().getXmiType().equals(Enums.XMI_Type.UML_LiteralUnlimitedNatural.toString()) && owned.getLowerValue().getXmiType().equals(Enums.XMI_Type.UML_LiteralInteger.toString())) {
+            try {
+                return Integer.parseInt(owned.getUpperValue().getValue()) > 0 && owned.getLowerValue().getValue() == null;
+            } catch (Exception ex) { }
+        }
+
+        return false;
+    }
 }

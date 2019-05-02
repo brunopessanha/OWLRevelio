@@ -8,7 +8,9 @@ public class Enums {
         ParticipantProperty("Blocks:ParticipantProperty"),
         PackagedElement("packagedElement"),
         OwnedAttribute("ownedAttribute"),
-        OwnedEnd("ownedEnd");
+        OwnedEnd("ownedEnd"),
+        LowerValue("lowerValue"),
+        UpperValue("upperValue");
 
         private String tagName;
 
@@ -31,7 +33,8 @@ public class Enums {
         Name("name"),
         Aggregation("aggregation"),
         General("general"),
-        Type("type");
+        Type("type"),
+        Value("value");
 
         private String attributeName;
 
@@ -52,7 +55,9 @@ public class Enums {
         UML_Association("uml:Association"),
         UML_Property("uml:Property"),
         UML_Generalization("uml:Generalization"),
-        UML_DataType("uml:DataType");
+        UML_DataType("uml:DataType"),
+        UML_LiteralUnlimitedNatural("uml:LiteralUnlimitedNatural"),
+        UML_LiteralInteger("uml:LiteralInteger");
 
         private String type;
 
@@ -67,6 +72,7 @@ public class Enums {
     }
 
     public enum Association {
+
         HasPart ("hasPart");
 
         private String name;
