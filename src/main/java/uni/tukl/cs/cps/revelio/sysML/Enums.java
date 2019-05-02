@@ -66,4 +66,17 @@ public class Enums {
         }
     }
 
+    public enum Association {
+        HasPart ("hasPart");
+
+        private String name;
+
+        Association(String name) { this.name = name; }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
 }

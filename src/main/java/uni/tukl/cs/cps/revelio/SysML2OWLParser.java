@@ -2,13 +2,16 @@ package uni.tukl.cs.cps.revelio;
 
 import org.semanticweb.owlapi.model.*;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 interface SysML2OWLParser {
 
-    List<OWLClass> GetClasses();
-    List<OWLObjectProperty> GetObjectProperties();
-    List<OWLDataProperty> GetDataProperties();
-    List<OWLIndividual> GetIndividuals();
+    Stream<OWLClassAxiom> classAxioms();
+
+    Stream<OWLObjectPropertyAxiom> objectPropertyAxioms();
+
+    Stream<OWLDataPropertyAxiom> dataPropertyAxioms();
+
+    Stream<OWLIndividualAxiom> individualAxioms();
 
 }

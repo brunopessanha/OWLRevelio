@@ -1,11 +1,11 @@
 package uni.tukl.cs.cps.revelio;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import uni.tukl.cs.cps.revelio.exceptions.InvalidSysMLFileException;
+import uni.tukl.cs.cps.revelio.owl.OntologyManager;
 import uni.tukl.cs.cps.revelio.sysML.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -17,30 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Revelio implements SysML2OWLParser {
 
-    private final OWLDataFactory dataFactory;
-    private final OWLOntologyManager ontologyManager;
-
-    private String rootClass;
-    private String ontologyPrefix;
     private Map<String, Block> blockMap;
     private Map<String, ParticipantProperty> propertyMap;
     private List<Association> associations;
 
-    private List<OWLClass> classes;
-    private List<OWLObjectProperty> objectProperties;
-    private List<OWLDataProperty> dataProperties;
-    private List<OWLIndividual> individuals;
+    private OntologyManager ontologyManager;
 
     public Revelio(String filePath, String ontologyPrefix, String rootClass) throws InvalidSysMLFileException {
 
-        this.ontologyManager = OWLManager.createOWLOntologyManager();
-        this.dataFactory = ontologyManager.getOWLDataFactory();
-        this.ontologyPrefix = ontologyPrefix;
         this.associations = new ArrayList<>();
-        this.rootClass = rootClass;
 
         Document doc = null;
 
@@ -51,17 +40,20 @@ public class Revelio implements SysML2OWLParser {
             if(!doc.getDocumentElement().getNodeName().equals(Enums.XML_Tag.XMI.toString())) {
                 throw new InvalidSysMLFileException("The file provided is not a valid XMI file.");
             }
-            parseBlockDiagram(doc);
+            parseBlockDiagram(doc, rootClass);
+
+
+            this.ontologyManager = new OntologyManager(ontologyPrefix, rootClass, this);
 
         } catch (ParserConfigurationException | IOException | SAXException ex) {
             throw new InvalidSysMLFileException(ex);
         }
     }
 
-    private void parseBlockDiagram(Document doc) {
+    private void parseBlockDiagram(Document doc, String rootClass) {
 
         blockMap = parseNodesByTag(doc, Enums.XML_Tag.BlockDiagram.toString()).stream()
-                .map(t -> new Block(t.getBase(), this.rootClass)).collect(Collectors.toMap(Block::getId, block -> block));
+                .map(t -> new Block(t.getBase(), rootClass)).collect(Collectors.toMap(Block::getId, block -> block));
 
         propertyMap = parseNodesByTag(doc, Enums.XML_Tag.ParticipantProperty.toString()).stream()
                 .map(t -> new ParticipantProperty(t.getBase())).collect(Collectors.toMap(ParticipantProperty::getId, property -> property));
@@ -143,31 +135,39 @@ public class Revelio implements SysML2OWLParser {
         return umlAssociations;
     }
 
-    @Override
-    public List<OWLClass> GetClasses() {
-        if (classes == null) {
-            classes = new ArrayList<>();
-            for (Block block : blockMap.values()) {
-                IRI iri = IRI.create(ontologyPrefix, block.getName());
-                OWLClass owlClass = dataFactory.getOWLClass(iri);
-                classes.add(owlClass);
-            }
-        }
-        return classes;
+    public Map<String, Block> getBlockMap(){
+        return blockMap;
+    }
+
+    public Map<String, ParticipantProperty> getPropertyMap() {
+        return propertyMap;
+    }
+
+    public List<Association> getAssociations() {
+        return associations;
     }
 
     @Override
-    public List<OWLObjectProperty> GetObjectProperties() {
-        return objectProperties;
+    public Stream<OWLClassAxiom> classAxioms() {
+       return ontologyManager.classAxioms();
     }
 
     @Override
-    public List<OWLDataProperty> GetDataProperties() {
-        return dataProperties;
+    public Stream<OWLObjectPropertyAxiom> objectPropertyAxioms() {
+        return ontologyManager.objectPropertyAxioms();
     }
 
     @Override
-    public List<OWLIndividual> GetIndividuals() {
-        return individuals;
+    public Stream<OWLDataPropertyAxiom> dataPropertyAxioms() {
+        return ontologyManager.dataPropertyAxioms();
+    }
+
+    @Override
+    public Stream<OWLIndividualAxiom> individualAxioms() {
+        return ontologyManager.individualAxioms();
+    }
+
+    public void saveOntology(File file) throws OWLOntologyCreationException, OWLOntologyStorageException {
+        ontologyManager.saveOntology(file);
     }
 }
