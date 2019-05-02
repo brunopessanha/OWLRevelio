@@ -6,6 +6,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import uni.tukl.cs.cps.revelio.exceptions.InvalidSysMLFileException;
 import uni.tukl.cs.cps.revelio.owl.OntologyManager;
+import uni.tukl.cs.cps.revelio.parser.Enums;
+import uni.tukl.cs.cps.revelio.parser.SysML2OWLParser;
 import uni.tukl.cs.cps.revelio.sysML.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -88,8 +90,6 @@ public class Revelio implements SysML2OWLParser {
                 }
             }
         }
-
-        System.out.println("Block Name: " + block.getName() + " Super class: " + block.getSuperClass());
     }
 
     private List<SysMLTag> parseNodesByTag(Document doc, String tagName) {
@@ -125,9 +125,6 @@ public class Revelio implements SysML2OWLParser {
                     owner = new OwnedEnd(packagedElement.getChildNodes().item(i));
                     Association association = new Association(packagedElement, owner, owned);
                     umlAssociations.add(association);
-
-                    System.out.println("Association (" + association.getOwned().getAggregation() + "): " + association.getName() + " -> "
-                            + blockMap.get(association.getOwner().getType()).getName() + " hasPart " + blockMap.get(association.getOwned().getType()).getName());
                 }
             }
         }

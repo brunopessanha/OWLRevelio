@@ -1,6 +1,7 @@
 package uni.tukl.cs.cps.revelio.sysML;
 
 import org.w3c.dom.NamedNodeMap;
+import uni.tukl.cs.cps.revelio.parser.Enums;
 
 public class LowerValue extends Value {
 

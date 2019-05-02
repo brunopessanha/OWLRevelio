@@ -2,6 +2,7 @@ package uni.tukl.cs.cps.revelio.sysML;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
+import uni.tukl.cs.cps.revelio.parser.Enums;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,5 +1,7 @@
 package uni.tukl.cs.cps.revelio.sysML;
 
+import uni.tukl.cs.cps.revelio.parser.Enums;
+
 public class Association extends SysMLNode {
 
     private OwnedEnd owner;

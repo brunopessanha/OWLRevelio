@@ -2,6 +2,7 @@ package uni.tukl.cs.cps.revelio.sysML;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import uni.tukl.cs.cps.revelio.parser.Enums;
 
 public class SysMLNode {
 

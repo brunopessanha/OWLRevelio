@@ -3,10 +3,10 @@ package uni.tukl.cs.cps.revelio.owl;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import uni.tukl.cs.cps.revelio.Revelio;
+import uni.tukl.cs.cps.revelio.parser.SysML2OWLParser;
 import uni.tukl.cs.cps.revelio.sysML.Association;
 import uni.tukl.cs.cps.revelio.sysML.Block;
-import uni.tukl.cs.cps.revelio.sysML.Enums;
-import uni.tukl.cs.cps.revelio.sysML.OwnedEnd;
+import uni.tukl.cs.cps.revelio.parser.Enums;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,7 +18,6 @@ public class OntologyManager {
 
     private final OWLOntologyManager ontologyManager;
     private final OWLDataFactory dataFactory;
-    private OWLOntology ontology;
 
     private List<OWLClassAxiom> classAxioms;
     private List<OWLObjectPropertyAxiom> objectPropertyAxioms;
@@ -29,14 +28,14 @@ public class OntologyManager {
     private String rootClass;
     private String ontologyPrefix;
 
-    private Revelio revelio;
+    private SysML2OWLParser parser;
 
-    public OntologyManager(String ontologyPrefix, String rootClass, Revelio revelio) {
+    public OntologyManager(String ontologyPrefix, String rootClass, SysML2OWLParser parser) {
         this.ontologyManager = OWLManager.createOWLOntologyManager();
         this.dataFactory = ontologyManager.getOWLDataFactory();
         this.ontologyPrefix = ontologyPrefix;
         this.rootClass = rootClass;
-        this.revelio = revelio;
+        this.parser = parser;
     }
 
     public String getRootClass() {
@@ -59,7 +58,7 @@ public class OntologyManager {
         if (classAxioms == null) {
             classAxioms = new ArrayList<>();
 
-            for (Block block : revelio.getBlockMap().values()) {
+            for (Block block : parser.getBlockMap().values()) {
                 OWLClass owlClass = getOWLClass(block.getName());
                 OWLClass owlParentClass = getOWLClass(block.getSuperClass());
 
@@ -68,10 +67,10 @@ public class OntologyManager {
                 classAxioms.add(axiom);
             }
 
-            for (Association association : revelio.getAssociations()) {
+            for (Association association : parser.getAssociations()) {
 
-                OWLClass owlOwnerClass = getOWLClass(revelio.getBlockMap().get(association.getOwner().getType()).getName());
-                OWLClass owlOwnedClass = getOWLClass(revelio.getBlockMap().get(association.getOwned().getType()).getName());
+                OWLClass owlOwnerClass = getOWLClass(parser.getBlockMap().get(association.getOwner().getType()).getName());
+                OWLClass owlOwnedClass = getOWLClass(parser.getBlockMap().get(association.getOwned().getType()).getName());
 
                 OWLObjectProperty hasPartRelation = dataFactory.getOWLObjectProperty(getIRI(Enums.Association.HasPart.toString()));
                 OWLClassExpression classExpression = getOWLClassExpression(association, owlOwnedClass, hasPartRelation);
@@ -143,7 +142,7 @@ public class OntologyManager {
     }
 
     public void saveOntology(File file) throws OWLOntologyStorageException, OWLOntologyCreationException {
-        ontology = ontologyManager.createOntology(IRI.create(file.toURI()));
+        OWLOntology ontology = ontologyManager.createOntology(IRI.create(file.toURI()));
         ontology.addAxioms(axioms());
         ontologyManager.saveOntology(ontology);
     }
