@@ -37,14 +37,14 @@ public class Revelio implements SysML2OWLParser {
 
         try {
             File file = new File(filePath);
+
             DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             doc = dBuilder.parse(file);
             if(!doc.getDocumentElement().getNodeName().equals(Enums.XML_Tag.XMI.toString())) {
                 throw new InvalidSysMLFileException("The file provided is not a valid XMI file.");
             }
+
             parseBlockDiagram(doc, rootClass);
-
-
             this.ontologyManager = new OntologyManager(ontologyPrefix, rootClass, this);
 
         } catch (ParserConfigurationException | IOException | SAXException ex) {
@@ -67,6 +67,7 @@ public class Revelio implements SysML2OWLParser {
 
             if (packagedElement.getType().equals(Enums.XMI_Type.UML_Class.toString()) && blockMap.containsKey(packagedElement.getId())) {
                 parseBlock(packagedElement);
+
             } else if (packagedElement.getType().equals(Enums.XMI_Type.UML_Association.toString())) {
                 associations.addAll(parseAssociation(packagedElement));
             }
@@ -78,12 +79,19 @@ public class Revelio implements SysML2OWLParser {
         block.setName(packagedElement.getName());
 
         for (int i = 0; i < packagedElement.getChildNodes().getLength(); i++) {
+
             SysMLNode childNode = new SysMLNode(packagedElement.getChildNodes().item(i).getAttributes());
+
             if (childNode.getXmiType() != null) {
+
                 if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Property.toString())) {
+
                     propertyMap.get(childNode.getId()).setName(childNode.getName());
-                    block.getAttributes().add(new OwnedAttribute(childNode));
+
+                    block.getAttributes().add(new OwnedAttribute(childNode, packagedElement.getChildNodes().item(i).getChildNodes()));
+
                 } else if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Generalization.toString())) {
+
                     Generalization generalization = new Generalization(childNode);
                     generalization.setGeneral(packagedElement.getChildNodes().item(i).getAttributes().getNamedItem(Enums.XML_Attribute.General.toString()).getNodeValue());
                     block.setSuperClass(blockMap.get(generalization.getGeneral()).getName());
@@ -93,15 +101,19 @@ public class Revelio implements SysML2OWLParser {
     }
 
     private List<SysMLTag> parseNodesByTag(Document doc, String tagName) {
+
         NodeList nodeBlocks = doc.getElementsByTagName(tagName);
         List<SysMLTag> tags = new ArrayList<>();
+
         for (int i = 0; i < nodeBlocks.getLength(); i++) {
             SysMLTag tag = null;
+
             if (tagName.equals(Enums.XML_Tag.BlockDiagram.toString())) {
                 tag = new SysMLTag(tagName, nodeBlocks.item(i).getAttributes().getNamedItem(Enums.XML_Attribute.BaseClass.toString()).getNodeValue());
             } else if (tagName.equals(Enums.XML_Tag.ParticipantProperty.toString())) {
                 tag = new SysMLTag(tagName, nodeBlocks.item(i).getAttributes().getNamedItem(Enums.XML_Attribute.BaseProperty.toString()).getNodeValue());
             }
+
             if (tag != null) {
                 tags.add(tag);
             }
@@ -117,7 +129,9 @@ public class Revelio implements SysML2OWLParser {
 
         boolean foundPart = false;
         for (int i = 0; i < packagedElement.getChildNodes().getLength() && owner == null; i++) {
+
             if (packagedElement.getChildNodes().item(i).getNodeName().equals(Enums.XML_Tag.OwnedEnd.toString())) {
+
                 if (!foundPart) {
                     foundPart = true;
                     owned = new OwnedEnd(packagedElement.getChildNodes().item(i));
@@ -162,6 +176,11 @@ public class Revelio implements SysML2OWLParser {
     @Override
     public Stream<OWLIndividualAxiom> individualAxioms() {
         return ontologyManager.individualAxioms();
+    }
+
+    @Override
+    public Stream<OWLAxiom> axioms() {
+        return ontologyManager.axioms();
     }
 
     public void saveOntology(File file) throws OWLOntologyCreationException, OWLOntologyStorageException {

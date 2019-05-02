@@ -19,6 +19,8 @@ public interface SysML2OWLParser {
 
     Stream<OWLIndividualAxiom> individualAxioms();
 
+    Stream<OWLAxiom> axioms();
+
     Map<String, Block> getBlockMap();
 
     Map<String, ParticipantProperty> getPropertyMap();

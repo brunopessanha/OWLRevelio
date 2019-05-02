@@ -2,11 +2,11 @@ package uni.tukl.cs.cps.revelio.owl;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
-import uni.tukl.cs.cps.revelio.Revelio;
 import uni.tukl.cs.cps.revelio.parser.SysML2OWLParser;
 import uni.tukl.cs.cps.revelio.sysML.Association;
 import uni.tukl.cs.cps.revelio.sysML.Block;
 import uni.tukl.cs.cps.revelio.parser.Enums;
+import uni.tukl.cs.cps.revelio.sysML.OwnedAttribute;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,6 +36,11 @@ public class OntologyManager {
         this.ontologyPrefix = ontologyPrefix;
         this.rootClass = rootClass;
         this.parser = parser;
+        this.classAxioms = new ArrayList<>();
+        this.objectPropertyAxioms = new ArrayList<>();
+        this.dataPropertyAxioms = new ArrayList<>();
+        this.individualAxioms = new ArrayList<>();
+        this.generateAxioms();
     }
 
     public String getRootClass() {
@@ -46,6 +51,10 @@ public class OntologyManager {
         return ontologyPrefix;
     }
 
+    public IRI getDataPropertyIRI(String name) {
+        return this.getIRI("has" + name);
+    }
+
     public IRI getIRI(String name) {
         return IRI.create(ontologyPrefix, name);
     }
@@ -54,34 +63,47 @@ public class OntologyManager {
         return dataFactory.getOWLClass(getIRI(name));
     }
 
-    public Stream<OWLClassAxiom> classAxioms() {
-        if (classAxioms == null) {
-            classAxioms = new ArrayList<>();
+    public void generateAxioms() {
+        for (Block block : parser.getBlockMap().values()) {
 
-            for (Block block : parser.getBlockMap().values()) {
-                OWLClass owlClass = getOWLClass(block.getName());
-                OWLClass owlParentClass = getOWLClass(block.getSuperClass());
+            OWLClass owlClass = getOWLClass(block.getName());
+            OWLClass owlParentClass = getOWLClass(block.getSuperClass());
 
-                OWLClassAxiom axiom = dataFactory.getOWLSubClassOfAxiom(owlClass, owlParentClass);
+            OWLClassAxiom axiom = dataFactory.getOWLSubClassOfAxiom(owlClass, owlParentClass);
 
-                classAxioms.add(axiom);
-            }
+            classAxioms.add(axiom);
 
-            for (Association association : parser.getAssociations()) {
-
-                OWLClass owlOwnerClass = getOWLClass(parser.getBlockMap().get(association.getOwner().getType()).getName());
-                OWLClass owlOwnedClass = getOWLClass(parser.getBlockMap().get(association.getOwned().getType()).getName());
-
-                OWLObjectProperty hasPartRelation = dataFactory.getOWLObjectProperty(getIRI(Enums.Association.HasPart.toString()));
-                OWLClassExpression classExpression = getOWLClassExpression(association, owlOwnedClass, hasPartRelation);
-
-                OWLClassAxiom axiom = dataFactory.getOWLSubClassOfAxiom(owlOwnerClass, classExpression);
-
-                classAxioms.add(axiom);
-            }
+            getBlockAttributesAxioms(block.getAttributes(), owlClass);
         }
 
-        return classAxioms.stream();
+        for (Association association : parser.getAssociations()) {
+
+            OWLClass owlOwnerClass = getOWLClass(parser.getBlockMap().get(association.getOwner().getType()).getName());
+            OWLClass owlOwnedClass = getOWLClass(parser.getBlockMap().get(association.getOwned().getType()).getName());
+
+            OWLObjectProperty hasPartRelation = dataFactory.getOWLObjectProperty(getIRI(Enums.Association.HasPart.toString()));
+            OWLClassExpression classExpression = getOWLClassExpression(association, owlOwnedClass, hasPartRelation);
+
+            OWLClassAxiom axiom = dataFactory.getOWLSubClassOfAxiom(owlOwnerClass, classExpression);
+
+            classAxioms.add(axiom);
+        }
+    }
+
+    private void getBlockAttributesAxioms(List<OwnedAttribute> attributes, OWLClass blockClass) {
+        for (OwnedAttribute attribute : attributes) {
+
+            OWLDataProperty dataProperty = dataFactory.getOWLDataProperty(getDataPropertyIRI(attribute.getName()));
+
+            OWLDataPropertyRangeAxiom rangeAxiom = dataFactory.getOWLDataPropertyRangeAxiom(dataProperty, attribute.getDataType().getDatatype(dataFactory));
+
+            dataPropertyAxioms.add(rangeAxiom);
+
+            OWLClassExpression classExpression = dataFactory.getOWLDataSomeValuesFrom(dataProperty, attribute.getDataType());
+            OWLClassAxiom dataPropertyRestrictionAxiom = dataFactory.getOWLSubClassOfAxiom(blockClass, classExpression);
+
+            classAxioms.add(dataPropertyRestrictionAxiom);
+        }
     }
 
     private OWLClassExpression getOWLClassExpression(Association association, OWLClass owlOwnedClass, OWLObjectProperty hasPartRelation) {
@@ -109,35 +131,28 @@ public class OntologyManager {
         return classExpression;
     }
 
+    public Stream<OWLClassAxiom> classAxioms() {
+        return classAxioms.stream();
+    }
+
     public Stream<OWLObjectPropertyAxiom> objectPropertyAxioms() {
-        if (objectPropertyAxioms == null) {
-            objectPropertyAxioms = new ArrayList<>();
-        }
         return objectPropertyAxioms.stream();
     }
 
     public Stream<OWLDataPropertyAxiom> dataPropertyAxioms() {
-        if (dataPropertyAxioms == null) {
-            dataPropertyAxioms = new ArrayList<>();
-        }
         return dataPropertyAxioms.stream();
     }
 
     public Stream<OWLIndividualAxiom> individualAxioms() {
-        if (individualAxioms == null) {
-            individualAxioms = new ArrayList<>();
-        }
         return individualAxioms.stream();
     }
 
     public Stream<OWLAxiom> axioms() {
-        if (axioms == null) {
-            axioms = new ArrayList<>();
-            axioms.addAll(classAxioms().collect(Collectors.toList()));
-            axioms.addAll(objectPropertyAxioms().collect(Collectors.toList()));
-            axioms.addAll(dataPropertyAxioms().collect(Collectors.toList()));
-            axioms.addAll(individualAxioms().collect(Collectors.toList()));
-        }
+        axioms = new ArrayList<>();
+        axioms.addAll(classAxioms().collect(Collectors.toList()));
+        axioms.addAll(objectPropertyAxioms().collect(Collectors.toList()));
+        axioms.addAll(dataPropertyAxioms().collect(Collectors.toList()));
+        axioms.addAll(individualAxioms().collect(Collectors.toList()));
         return axioms.stream();
     }
 

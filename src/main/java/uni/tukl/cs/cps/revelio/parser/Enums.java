@@ -34,7 +34,8 @@ public class Enums {
         Aggregation("aggregation"),
         General("general"),
         Type("type"),
-        Value("value");
+        Value("value"),
+        Href("href");
 
         private String attributeName;
 
