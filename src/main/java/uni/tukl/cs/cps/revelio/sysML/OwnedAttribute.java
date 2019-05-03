@@ -13,20 +13,23 @@ public class OwnedAttribute extends SysMLNode {
         this.id = node.id;
         this.name = node.name;
         this.xmiType = node.xmiType;
+        this.type = node.type;
 
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node child = childNodes.item(i);
-            if (child.getNodeName() == Enums.XML_Attribute.Type.toString()) {
-                String composedDataType = getAttributeValue(child.getAttributes(), Enums.XML_Attribute.Href.toString());
-                if (composedDataType != null) {
-                    if (composedDataType.contains("Integer")) {
-                        this.dataType = OWL2Datatype.XSD_INTEGER;
-                    } else if (composedDataType.contains("Real") || composedDataType.contains("Number")) {
-                        this.dataType = OWL2Datatype.XSD_FLOAT;
-                    } else {
-                        this.dataType = OWL2Datatype.XSD_STRING;
+        if (type == null) {
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node child = childNodes.item(i);
+                if (child.getNodeName() == Enums.XML_Attribute.Type.toString()) {
+                    String composedDataType = getAttributeValue(child.getAttributes(), Enums.XML_Attribute.Href.toString());
+                    if (composedDataType != null) {
+                        if (composedDataType.contains("Integer")) {
+                            this.dataType = OWL2Datatype.XSD_INTEGER;
+                        } else if (composedDataType.contains("Real") || composedDataType.contains("Number")) {
+                            this.dataType = OWL2Datatype.XSD_FLOAT;
+                        } else {
+                            this.dataType = OWL2Datatype.XSD_STRING;
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }

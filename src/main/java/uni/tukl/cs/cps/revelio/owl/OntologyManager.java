@@ -92,17 +92,25 @@ public class OntologyManager {
 
     private void getBlockAttributesAxioms(List<OwnedAttribute> attributes, OWLClass blockClass) {
         for (OwnedAttribute attribute : attributes) {
+            if (attribute.getDataType() != null) { // data property attribute
 
-            OWLDataProperty dataProperty = dataFactory.getOWLDataProperty(getDataPropertyIRI(attribute.getName()));
+                OWLDataProperty dataProperty = dataFactory.getOWLDataProperty(getDataPropertyIRI(attribute.getName()));
 
-            OWLDataPropertyRangeAxiom rangeAxiom = dataFactory.getOWLDataPropertyRangeAxiom(dataProperty, attribute.getDataType().getDatatype(dataFactory));
+                OWLDataPropertyRangeAxiom rangeAxiom = dataFactory.getOWLDataPropertyRangeAxiom(dataProperty, attribute.getDataType().getDatatype(dataFactory));
 
-            dataPropertyAxioms.add(rangeAxiom);
+                dataPropertyAxioms.add(rangeAxiom);
 
-            OWLClassExpression classExpression = dataFactory.getOWLDataSomeValuesFrom(dataProperty, attribute.getDataType());
-            OWLClassAxiom dataPropertyRestrictionAxiom = dataFactory.getOWLSubClassOfAxiom(blockClass, classExpression);
+                OWLClassExpression classExpression = dataFactory.getOWLDataSomeValuesFrom(dataProperty, attribute.getDataType());
+                OWLClassAxiom dataPropertyRestrictionAxiom = dataFactory.getOWLSubClassOfAxiom(blockClass, classExpression);
 
-            classAxioms.add(dataPropertyRestrictionAxiom);
+                classAxioms.add(dataPropertyRestrictionAxiom);
+            } else { //instance attribute of internal block diagram
+
+                OWLIndividual individual = dataFactory.getOWLNamedIndividual(getIRI(attribute.getName()));
+                OWLClass individualType = dataFactory.getOWLClass(getIRI(parser.getBlockMap().get(attribute.getType()).getName()));
+
+                individualAxioms.add(dataFactory.getOWLClassAssertionAxiom(individualType, individual));
+            }
         }
     }
 
