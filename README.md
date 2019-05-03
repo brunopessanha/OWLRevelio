@@ -1,4 +1,4 @@
-# OWLRevelio
+# OWL Revelio
 Translates restriced SysML Block Diagrams & Internal Block Diagrams into OWL Ontology
 
 ### Currently supported features mapping from SysML to OWL
@@ -11,3 +11,7 @@ Translates restriced SysML Block Diagrams & Internal Block Diagrams into OWL Ont
 
 ### Supported Tools
 - Papyrus: https://www.eclipse.org/papyrus/
+
+### Why Revelio?
+
+<i>Revelio</i> is a revealing Charm from Harry Potter, which has several variations and applications. When <i>Revelio</i> is used directly on a person, it removes magical disguises. <b>OWL Revelio</b> reveals the Ontology hidden in SysML models.
