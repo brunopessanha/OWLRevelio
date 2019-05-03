@@ -7,11 +7,11 @@ import uni.tukl.cs.cps.revelio.sysML.Association;
 import uni.tukl.cs.cps.revelio.sysML.Block;
 import uni.tukl.cs.cps.revelio.parser.Enums;
 import uni.tukl.cs.cps.revelio.sysML.OwnedAttribute;
+import uni.tukl.cs.cps.revelio.sysML.OwnedComment;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class OntologyManager {
@@ -23,7 +23,7 @@ public class OntologyManager {
     private List<OWLObjectPropertyAxiom> objectPropertyAxioms;
     private List<OWLDataPropertyAxiom> dataPropertyAxioms;
     private List<OWLIndividualAxiom> individualAxioms;
-    private List<OWLAxiom> axioms;
+    private List<OWLAnnotationAxiom> annotationAxioms;
 
     private String rootClass;
     private String ontologyPrefix;
@@ -40,6 +40,7 @@ public class OntologyManager {
         this.objectPropertyAxioms = new ArrayList<>();
         this.dataPropertyAxioms = new ArrayList<>();
         this.individualAxioms = new ArrayList<>();
+        this.annotationAxioms = new ArrayList<>();
         this.generateAxioms();
     }
 
@@ -63,17 +64,30 @@ public class OntologyManager {
         return dataFactory.getOWLClass(getIRI(name));
     }
 
+    private OWLAnnotationAxiom getCommentAxiom(String comment, IRI iri) {
+        OWLLiteral literal = dataFactory.getOWLLiteral(comment);
+        OWLAnnotationProperty commentAnnotation = dataFactory.getRDFSComment();
+
+        OWLAnnotation annotation = dataFactory.getOWLAnnotation(commentAnnotation, literal);
+        OWLAnnotationAxiom commentAxiom = dataFactory.getOWLAnnotationAssertionAxiom(iri, annotation);
+
+        return commentAxiom;
+    }
+
+
     public void generateAxioms() {
         for (Block block : parser.getBlockMap().values()) {
 
-            OWLClass owlClass = getOWLClass(block.getName());
+            OWLClass owlBlockClass = getOWLClass(block.getName());
             OWLClass owlParentClass = getOWLClass(block.getSuperClass());
 
-            OWLClassAxiom axiom = dataFactory.getOWLSubClassOfAxiom(owlClass, owlParentClass);
+            OWLClassAxiom axiom = dataFactory.getOWLSubClassOfAxiom(owlBlockClass, owlParentClass);
 
             classAxioms.add(axiom);
 
-            getBlockAttributesAxioms(block.getAttributes(), owlClass);
+            getBlockCommentsAxioms(block.getComments(), owlBlockClass);
+
+            getBlockAttributesAxioms(block.getAttributes(), owlBlockClass);
         }
 
         for (Association association : parser.getAssociations()) {
@@ -87,6 +101,12 @@ public class OntologyManager {
             OWLClassAxiom axiom = dataFactory.getOWLSubClassOfAxiom(owlOwnerClass, classExpression);
 
             classAxioms.add(axiom);
+        }
+    }
+
+    private void getBlockCommentsAxioms(List<OwnedComment> comments, OWLClass blockClass) {
+        for (OwnedComment comment : comments) {
+            annotationAxioms.add(getCommentAxiom(comment.getBody(), blockClass.getIRI()));
         }
     }
 
@@ -155,12 +175,19 @@ public class OntologyManager {
         return individualAxioms.stream();
     }
 
+    public Stream<OWLAnnotationAxiom> annotationAxioms() {
+        return annotationAxioms.stream();
+    }
+
     public Stream<OWLAxiom> axioms() {
-        axioms = new ArrayList<>();
-        axioms.addAll(classAxioms().collect(Collectors.toList()));
-        axioms.addAll(objectPropertyAxioms().collect(Collectors.toList()));
-        axioms.addAll(dataPropertyAxioms().collect(Collectors.toList()));
-        axioms.addAll(individualAxioms().collect(Collectors.toList()));
+        List<OWLAxiom> axioms = new ArrayList<>();
+
+        axioms.addAll(classAxioms);
+        axioms.addAll(objectPropertyAxioms);
+        axioms.addAll(dataPropertyAxioms);
+        axioms.addAll(individualAxioms);
+        axioms.addAll(annotationAxioms);
+
         return axioms.stream();
     }
 

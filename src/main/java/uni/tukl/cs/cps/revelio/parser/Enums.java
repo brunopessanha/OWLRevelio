@@ -10,7 +10,10 @@ public class Enums {
         OwnedAttribute("ownedAttribute"),
         OwnedEnd("ownedEnd"),
         LowerValue("lowerValue"),
-        UpperValue("upperValue");
+        UpperValue("upperValue"),
+        Type("type"),
+        OwnedComment("ownedComment"),
+        Body("body");
 
         private String tagName;
 
@@ -58,7 +61,8 @@ public class Enums {
         UML_Generalization("uml:Generalization"),
         UML_DataType("uml:DataType"),
         UML_LiteralUnlimitedNatural("uml:LiteralUnlimitedNatural"),
-        UML_LiteralInteger("uml:LiteralInteger");
+        UML_LiteralInteger("uml:LiteralInteger"),
+        UML_Comment("uml:Comment");
 
         private String type;
 

@@ -27,16 +27,28 @@ public class RevelioTest {
 
     @Test
     public void GetClassAxiomsTest() {
-        assertEquals(14, revelio.classAxioms().count());
+        assertEquals(15, revelio.classAxioms().count());
     }
 
     @Test
     public void GetDataPropertyAxiomsTest() {
-        assertEquals(2, revelio.dataPropertyAxioms().count());
+        assertEquals(3, revelio.dataPropertyAxioms().count());
+    }
+
+
+    @Test
+    public void GetIndividualAxiomsTest() {
+        assertEquals(6, revelio.individualAxioms().count());
     }
 
     @Test
+    public void GetAnnotationAxiomsTest() {
+        assertEquals(3, revelio.annotationAxioms().count());
+    }
+
+
+    @Test
     public void GetTotalAxiomsTest() {
-        assertEquals(16, revelio.axioms().count());
+        assertEquals(27, revelio.axioms().count());
     }
 }

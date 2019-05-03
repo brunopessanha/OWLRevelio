@@ -7,12 +7,15 @@ public class Block extends SysMLNode {
 
     private List<OwnedAttribute> attributes;
 
+    private List<OwnedComment> comments;
+
     private String superClass;
 
     public Block(String id, String superClass) {
         this.id = id;
         this.superClass = superClass;
         this.attributes = new ArrayList<>();
+        this.comments = new ArrayList<>();
     }
 
     public List<OwnedAttribute> getAttributes() {
@@ -29,5 +32,13 @@ public class Block extends SysMLNode {
 
     public void setSuperClass(String superClass) {
         this.superClass = superClass;
+    }
+
+    public List<OwnedComment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<OwnedComment> comments) {
+        this.comments = comments;
     }
 }

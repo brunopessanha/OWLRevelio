@@ -18,7 +18,7 @@ public class OwnedAttribute extends SysMLNode {
         if (type == null) {
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node child = childNodes.item(i);
-                if (child.getNodeName() == Enums.XML_Attribute.Type.toString()) {
+                if (child.getNodeName() == Enums.XML_Tag.Type.toString()) {
                     String composedDataType = getAttributeValue(child.getAttributes(), Enums.XML_Attribute.Href.toString());
                     if (composedDataType != null) {
                         if (composedDataType.contains("Integer")) {

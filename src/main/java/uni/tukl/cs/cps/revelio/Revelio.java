@@ -88,6 +88,9 @@ public class Revelio implements SysML2OWLParser {
                     Generalization generalization = new Generalization(childNode);
                     generalization.setGeneral(packagedElement.getChildNodes().item(i).getAttributes().getNamedItem(Enums.XML_Attribute.General.toString()).getNodeValue());
                     block.setSuperClass(blockMap.get(generalization.getGeneral()).getName());
+                }  else if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Comment.toString())) {
+
+                    block.getComments().add(new OwnedComment(childNode, packagedElement.getChildNodes().item(i).getChildNodes()));
                 }
             }
         }
@@ -165,6 +168,11 @@ public class Revelio implements SysML2OWLParser {
     @Override
     public Stream<OWLIndividualAxiom> individualAxioms() {
         return ontologyManager.individualAxioms();
+    }
+
+    @Override
+    public Stream<OWLAnnotationAxiom> annotationAxioms() {
+        return ontologyManager.annotationAxioms();
     }
 
     @Override
