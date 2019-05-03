@@ -23,7 +23,5 @@ public interface SysML2OWLParser {
 
     Map<String, Block> getBlockMap();
 
-    Map<String, ParticipantProperty> getPropertyMap();
-
     List<Association> getAssociations();
 }

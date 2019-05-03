@@ -24,9 +24,7 @@ import java.util.stream.Stream;
 public class Revelio implements SysML2OWLParser {
 
     private Map<String, Block> blockMap;
-    private Map<String, ParticipantProperty> propertyMap;
     private List<Association> associations;
-
     private OntologyManager ontologyManager;
 
     public Revelio(String filePath, String ontologyPrefix, String rootClass) throws InvalidSysMLFileException {
@@ -57,9 +55,6 @@ public class Revelio implements SysML2OWLParser {
         blockMap = parseNodesByTag(doc, Enums.XML_Tag.BlockDiagram.toString()).stream()
                 .map(t -> new Block(t.getBase(), rootClass)).collect(Collectors.toMap(Block::getId, block -> block));
 
-        propertyMap = parseNodesByTag(doc, Enums.XML_Tag.ParticipantProperty.toString()).stream()
-                .map(t -> new ParticipantProperty(t.getBase())).collect(Collectors.toMap(ParticipantProperty::getId, property -> property));
-
         NodeList packagedElements = doc.getElementsByTagName(Enums.XML_Tag.PackagedElement.toString());
         for (int i = 0; i < packagedElements.getLength(); i++) {
 
@@ -85,8 +80,6 @@ public class Revelio implements SysML2OWLParser {
             if (childNode.getXmiType() != null) {
 
                 if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Property.toString())) {
-
-                    propertyMap.get(childNode.getId()).setName(childNode.getName());
 
                     block.getAttributes().add(new OwnedAttribute(childNode, packagedElement.getChildNodes().item(i).getChildNodes()));
 
@@ -148,10 +141,6 @@ public class Revelio implements SysML2OWLParser {
 
     public Map<String, Block> getBlockMap(){
         return blockMap;
-    }
-
-    public Map<String, ParticipantProperty> getPropertyMap() {
-        return propertyMap;
     }
 
     public List<Association> getAssociations() {
