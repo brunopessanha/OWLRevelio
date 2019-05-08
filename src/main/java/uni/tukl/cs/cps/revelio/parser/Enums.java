@@ -14,7 +14,8 @@ public class Enums {
         Type("type"),
         OwnedComment("ownedComment"),
         Body("body"),
-        End("end");
+        End("end"),
+        FullPort("PortsAndFlows:FullPort");
 
         private String tagName;
 
@@ -34,6 +35,7 @@ public class Enums {
         XMI_Type("xmi:type"),
         BaseClass("base_Class"),
         BaseProperty("base_Property"),
+        BasePort("base_Port"),
         Name("name"),
         Aggregation("aggregation"),
         General("general"),
@@ -67,7 +69,8 @@ public class Enums {
         UML_LiteralUnlimitedNatural("uml:LiteralUnlimitedNatural"),
         UML_LiteralInteger("uml:LiteralInteger"),
         UML_Comment("uml:Comment"),
-        UML_Connector("uml:Connector");
+        UML_Connector("uml:Connector"),
+        UML_Port("uml:Port");
 
         private String type;
 
@@ -81,13 +84,14 @@ public class Enums {
         }
     }
 
-    public enum Association {
+    public enum Relation {
 
-        HasPart ("hasPart");
+        HasPart ("hasPart"),
+        HasPort ("hasPort");
 
         private String name;
 
-        Association(String name) { this.name = name; }
+        Relation(String name) { this.name = name; }
 
         @Override
         public String toString() {
@@ -95,4 +99,19 @@ public class Enums {
         }
     }
 
+    public enum DataType {
+        Real ("Real"),
+        Integer ("Integer"),
+        String("String"),
+        Number("Number");
+
+        private String dataType;
+
+        DataType(String dataType) { this.dataType = dataType; }
+
+        @Override
+        public String toString() {
+            return dataType;
+        }
+    }
 }

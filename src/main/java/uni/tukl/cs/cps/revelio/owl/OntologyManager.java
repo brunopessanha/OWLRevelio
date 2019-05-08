@@ -2,7 +2,7 @@ package uni.tukl.cs.cps.revelio.owl;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
-import uni.tukl.cs.cps.revelio.parser.SysML2OWLParser;
+import uni.tukl.cs.cps.revelio.parser.ISysML2OWLParser;
 import uni.tukl.cs.cps.revelio.sysML.*;
 import uni.tukl.cs.cps.revelio.parser.Enums;
 
@@ -28,9 +28,9 @@ public class OntologyManager {
     private String ontologyPrefix;
     private Map<String, OWLIndividual> individuals;
 
-    private SysML2OWLParser parser;
+    private ISysML2OWLParser parser;
 
-    public OntologyManager(String ontologyPrefix, String rootClass, SysML2OWLParser parser) {
+    public OntologyManager(String ontologyPrefix, String rootClass, ISysML2OWLParser parser) {
         this.ontologyManager = OWLManager.createOWLOntologyManager();
         this.dataFactory = ontologyManager.getOWLDataFactory();
         this.ontologyPrefix = ontologyPrefix;
@@ -54,7 +54,11 @@ public class OntologyManager {
     }
 
     private OWLObjectProperty getHasPartRelation() {
-        return dataFactory.getOWLObjectProperty(getIRI(Enums.Association.HasPart.toString()));
+        return dataFactory.getOWLObjectProperty(getIRI(Enums.Relation.HasPart.toString()));
+    }
+
+    private OWLObjectProperty getHasPortRelation() {
+        return dataFactory.getOWLObjectProperty(getIRI(Enums.Relation.HasPort.toString()));
     }
 
     private IRI getDataPropertyIRI(String name) {
@@ -79,7 +83,6 @@ public class OntologyManager {
         return commentAxiom;
     }
 
-
     private void generateAxioms() {
         for (Block block : parser.getBlockMap().values()) {
 
@@ -95,6 +98,8 @@ public class OntologyManager {
             getBlockAttributesAxioms(block.getAttributes(), owlBlockClass);
 
             getBlockConnectorsAxioms(block.getConnectors());
+
+            getBlockPortsAxioms(block.getPorts(), owlBlockClass);
         }
 
         for (Association association : parser.getAssociations()) {
@@ -145,15 +150,39 @@ public class OntologyManager {
         }
     }
 
+    private void getBlockPortsAxioms(List<Port> ports, OWLClass block) {
+        for (Port port : ports) {
+            OWLClass owlPort = dataFactory.getOWLClass(port.getName());
+            OWLClass owlParentClass = getOWLClass(port.getSuperClass());
+
+            classAxioms.add(dataFactory.getOWLSubClassOfAxiom(owlPort, owlParentClass));
+
+            OWLClassExpression classExpression = dataFactory.getOWLObjectSomeValuesFrom(getHasPortRelation(), owlPort);
+            classAxioms.add(dataFactory.getOWLSubClassOfAxiom(block, classExpression));
+        }
+    }
+
+    private OWLObjectPropertyAssertionAxiom getHasPortAxiom(End end) {
+        OWLIndividual individual = individuals.get(end.getPartWithPort());
+        OWLIndividual port = dataFactory.getOWLNamedIndividual(parser.getPortMap().get(end.getRole()).getName());
+
+        return dataFactory.getOWLObjectPropertyAssertionAxiom(getHasPortRelation(), individual, port);
+    }
+
     private void getBlockConnectorsAxioms(List<OwnedConnector> connectors) {
         for (OwnedConnector connector : connectors) {
+            if (connector.getFirstEnd().getPartWithPort() != null && connector.getSecondEnd().getPartWithPort() != null) {
 
-            OWLIndividual firstIndividual = individuals.get(connector.getFirstEnd().getIndividualId());
-            OWLIndividual secondIndividual = individuals.get(connector.getSecondEnd().getIndividualId());
+                individualAxioms.add(getHasPortAxiom(connector.getFirstEnd()));
+                individualAxioms.add(getHasPortAxiom(connector.getSecondEnd()));
 
-            OWLIndividualAxiom axiom = dataFactory.getOWLObjectPropertyAssertionAxiom(getHasPartRelation(), secondIndividual, firstIndividual);
+            } else {
 
-            individualAxioms.add(axiom);
+                OWLIndividual firstIndividual = individuals.get(connector.getFirstEnd().getRole());
+                OWLIndividual secondIndividual = individuals.get(connector.getSecondEnd().getRole());
+
+                individualAxioms.add(dataFactory.getOWLObjectPropertyAssertionAxiom(getHasPartRelation(), firstIndividual, secondIndividual));
+            }
         }
     }
 

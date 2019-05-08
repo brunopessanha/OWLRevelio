@@ -7,7 +7,7 @@ import org.xml.sax.SAXException;
 import uni.tukl.cs.cps.revelio.exceptions.InvalidSysMLFileException;
 import uni.tukl.cs.cps.revelio.owl.OntologyManager;
 import uni.tukl.cs.cps.revelio.parser.Enums;
-import uni.tukl.cs.cps.revelio.parser.SysML2OWLParser;
+import uni.tukl.cs.cps.revelio.parser.ISysML2OWLParser;
 import uni.tukl.cs.cps.revelio.sysML.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -22,10 +22,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Revelio implements SysML2OWLParser {
+public class Revelio implements ISysML2OWLParser {
 
     private Map<String, Block> blockMap;
     private Map<String, OwnedAttribute> attributeMap;
+    private Map<String, Port> portMap;
+
     private List<Association> associations;
     private OntologyManager ontologyManager;
 
@@ -57,6 +59,9 @@ public class Revelio implements SysML2OWLParser {
 
         blockMap = parseNodesByTag(doc, Enums.XML_Tag.BlockDiagram.toString()).stream()
                 .map(t -> new Block(t.getBase(), rootClass)).collect(Collectors.toMap(Block::getId, block -> block));
+
+        portMap = parseNodesByTag(doc, Enums.XML_Tag.FullPort.toString()).stream()
+                .map(t -> new Port(t.getBase())).collect(Collectors.toMap(Port::getId, port -> port));
 
         NodeList packagedElements = doc.getElementsByTagName(Enums.XML_Tag.PackagedElement.toString());
         for (int i = 0; i < packagedElements.getLength(); i++) {
@@ -117,6 +122,14 @@ public class Revelio implements SysML2OWLParser {
                 } else if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Connector.toString())) {
 
                     block.getConnectors().add(new OwnedConnector(packagedElement.getChildNodes().item(i).getChildNodes()));
+
+                } else if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Port.toString())) {
+
+                    Port port = portMap.get(childNode.getId());
+                    port.setDataType(packagedElement.getChildNodes().item(i).getChildNodes());
+                    port.setName(childNode.getName());
+
+                    block.getPorts().add(port);
                 }
             }
         }
@@ -134,6 +147,8 @@ public class Revelio implements SysML2OWLParser {
                 tag = new SysMLTag(tagName, nodeBlocks.item(i).getAttributes().getNamedItem(Enums.XML_Attribute.BaseClass.toString()).getNodeValue());
             } else if (tagName.equals(Enums.XML_Tag.ParticipantProperty.toString())) {
                 tag = new SysMLTag(tagName, nodeBlocks.item(i).getAttributes().getNamedItem(Enums.XML_Attribute.BaseProperty.toString()).getNodeValue());
+            } else if (tagName.equals(Enums.XML_Tag.FullPort.toString())) {
+                tag = new SysMLTag(tagName, nodeBlocks.item(i).getAttributes().getNamedItem(Enums.XML_Attribute.BasePort.toString()).getNodeValue());
             }
 
             if (tag != null) {
@@ -170,6 +185,10 @@ public class Revelio implements SysML2OWLParser {
 
     public Map<String, Block> getBlockMap(){
         return blockMap;
+    }
+
+    public Map<String, Port> getPortMap(){
+        return portMap;
     }
 
     public List<Association> getAssociations() {

@@ -11,6 +11,8 @@ public class Block extends SysMLNode {
 
     private List<OwnedConnector> connectors;
 
+    private List<Port> ports;
+
     private String superClass;
 
     public Block(String id, String superClass) {
@@ -19,14 +21,11 @@ public class Block extends SysMLNode {
         this.attributes = new ArrayList<>();
         this.comments = new ArrayList<>();
         this.connectors = new ArrayList<>();
+        this.ports = new ArrayList<>();
     }
 
     public List<OwnedAttribute> getAttributes() {
         return attributes;
-    }
-
-    public void setAttributes(List<OwnedAttribute> attributes) {
-        this.attributes = attributes;
     }
 
     public String getSuperClass() {
@@ -41,15 +40,11 @@ public class Block extends SysMLNode {
         return comments;
     }
 
-    public void setComments(List<OwnedComment> comments) {
-        this.comments = comments;
-    }
-
     public List<OwnedConnector> getConnectors() {
         return connectors;
     }
 
-    public void setConnectors(List<OwnedConnector> connectors) {
-        this.connectors = connectors;
+    public List<Port> getPorts() {
+        return ports;
     }
 }
