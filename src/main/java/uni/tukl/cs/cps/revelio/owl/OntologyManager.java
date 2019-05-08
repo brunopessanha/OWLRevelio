@@ -90,7 +90,7 @@ public class OntologyManager {
 
             classAxioms.add(axiom);
 
-            getBlockCommentsAxioms(block.getComments(), owlBlockClass);
+            getCommentsAxioms(block.getComments(), owlBlockClass.getIRI());
 
             getBlockAttributesAxioms(block.getAttributes(), owlBlockClass);
 
@@ -110,9 +110,10 @@ public class OntologyManager {
         }
     }
 
-    private void getBlockCommentsAxioms(List<OwnedComment> comments, OWLClass blockClass) {
+
+    private void getCommentsAxioms(List<OwnedComment> comments, IRI iri) {
         for (OwnedComment comment : comments) {
-            annotationAxioms.add(getCommentAxiom(comment.getBody(), blockClass.getIRI()));
+            annotationAxioms.add(getCommentAxiom(comment.getBody(), iri));
         }
     }
 
@@ -132,12 +133,14 @@ public class OntologyManager {
                 classAxioms.add(dataPropertyRestrictionAxiom);
             } else { //instance attribute of internal block diagram
 
-                OWLIndividual individual = dataFactory.getOWLNamedIndividual(getIRI(attribute.getName()));
+                OWLNamedIndividual individual = dataFactory.getOWLNamedIndividual(getIRI(attribute.getName()));
                 OWLClass individualType = dataFactory.getOWLClass(getIRI(parser.getBlockMap().get(attribute.getType()).getName()));
 
                 individuals.put(attribute.getId(), individual);
 
                 individualAxioms.add(dataFactory.getOWLClassAssertionAxiom(individualType, individual));
+
+                getCommentsAxioms(attribute.getComments(), individual.getIRI());
             }
         }
     }

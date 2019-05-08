@@ -41,7 +41,8 @@ public class Enums {
         Value("value"),
         Href("href"),
         PartWithPort("partWithPort"),
-        Role("role");
+        Role("role"),
+        AnnotatedElement("annotatedElement");
 
         private String attributeName;
 

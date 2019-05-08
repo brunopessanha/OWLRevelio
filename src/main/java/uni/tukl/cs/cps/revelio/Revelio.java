@@ -16,6 +16,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,12 +25,14 @@ import java.util.stream.Stream;
 public class Revelio implements SysML2OWLParser {
 
     private Map<String, Block> blockMap;
+    private Map<String, OwnedAttribute> attributeMap;
     private List<Association> associations;
     private OntologyManager ontologyManager;
 
     public Revelio(String filePath, String ontologyPrefix, String rootClass) throws InvalidSysMLFileException {
 
         this.associations = new ArrayList<>();
+        this.attributeMap = new HashMap<>();
 
         Document doc = null;
 
@@ -62,9 +65,25 @@ public class Revelio implements SysML2OWLParser {
 
             if (packagedElement.getType().equals(Enums.XMI_Type.UML_Class.toString()) && blockMap.containsKey(packagedElement.getId())) {
                 parseBlock(packagedElement);
-
             } else if (packagedElement.getType().equals(Enums.XMI_Type.UML_Association.toString())) {
                 associations.addAll(parseAssociation(packagedElement));
+            }
+        }
+
+        NodeList ownedComments = doc.getElementsByTagName(Enums.XML_Tag.OwnedComment.toString());
+        for (int i = 0; i < ownedComments.getLength(); i++) {
+            OwnedComment ownedComment = new OwnedComment(ownedComments.item(i));
+            if (ownedComment.getAnnotatedElement() != null) {
+                String[] elements = ownedComment.getAnnotatedElement().trim().split("\\s+");
+                for (int ie = 0; ie < elements.length; ie ++) {
+                    if (blockMap.containsKey(elements[ie])) {
+                        Block block = blockMap.get(elements[ie]);
+                        block.getComments().add(ownedComment);
+                    } else if (attributeMap.containsKey(elements[ie])) {
+                        OwnedAttribute attribute = attributeMap.get(elements[ie]);
+                        attribute.getComments().add(ownedComment);
+                    }
+                }
             }
         }
     }
@@ -81,7 +100,9 @@ public class Revelio implements SysML2OWLParser {
 
                 if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Property.toString())) {
 
-                    block.getAttributes().add(new OwnedAttribute(childNode, packagedElement.getChildNodes().item(i).getChildNodes()));
+                    OwnedAttribute attribute = new OwnedAttribute(childNode, packagedElement.getChildNodes().item(i).getChildNodes());
+                    block.getAttributes().add(attribute);
+                    attributeMap.put(attribute.getId(), attribute);
 
                 } else if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Generalization.toString())) {
 
@@ -91,7 +112,7 @@ public class Revelio implements SysML2OWLParser {
 
                 }  else if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Comment.toString())) {
 
-                    block.getComments().add(new OwnedComment(childNode, packagedElement.getChildNodes().item(i).getChildNodes()));
+                    block.getComments().add(new OwnedComment(packagedElement.getChildNodes().item(i)));
 
                 } else if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Connector.toString())) {
 

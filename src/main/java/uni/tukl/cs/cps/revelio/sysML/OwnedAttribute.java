@@ -5,15 +5,21 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import uni.tukl.cs.cps.revelio.parser.Enums;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class OwnedAttribute extends SysMLNode {
 
     private OWL2Datatype dataType;
+
+    private List<OwnedComment> comments;
 
     public OwnedAttribute(SysMLNode node, NodeList childNodes) {
         this.id = node.id;
         this.name = node.name;
         this.xmiType = node.xmiType;
         this.type = node.type;
+        this.comments = new ArrayList<>();
 
         if (type == null) {
             for (int i = 0; i < childNodes.getLength(); i++) {
@@ -41,5 +47,9 @@ public class OwnedAttribute extends SysMLNode {
 
     public void setDataType(OWL2Datatype dataType) {
         this.dataType = dataType;
+    }
+
+    public List<OwnedComment> getComments() {
+        return comments;
     }
 }
