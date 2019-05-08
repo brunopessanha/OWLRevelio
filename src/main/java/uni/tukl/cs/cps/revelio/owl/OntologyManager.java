@@ -145,8 +145,8 @@ public class OntologyManager {
     private void getBlockConnectorsAxioms(List<OwnedConnector> connectors) {
         for (OwnedConnector connector : connectors) {
 
-            OWLIndividual firstIndividual = individuals.get(connector.getFirstEnd().getPartWithPort());
-            OWLIndividual secondIndividual = individuals.get(connector.getSecondEnd().getPartWithPort());
+            OWLIndividual firstIndividual = individuals.get(connector.getFirstEnd().getIndividualId());
+            OWLIndividual secondIndividual = individuals.get(connector.getSecondEnd().getIndividualId());
 
             OWLIndividualAxiom axiom = dataFactory.getOWLObjectPropertyAssertionAxiom(getHasPartRelation(), secondIndividual, firstIndividual);
 

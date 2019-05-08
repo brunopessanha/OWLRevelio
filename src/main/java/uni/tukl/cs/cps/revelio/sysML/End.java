@@ -32,4 +32,10 @@ public class End extends SysMLNode {
     public void setRole(String role) {
         this.role = role;
     }
+
+    public String getIndividualId() {
+        if (partWithPort != null)
+            return partWithPort;
+        return role;
+    }
 }
