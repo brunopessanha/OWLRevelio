@@ -35,10 +35,9 @@ public class RevelioTest {
         assertEquals(3, revelio.dataPropertyAxioms().count());
     }
 
-
     @Test
     public void GetIndividualAxiomsTest() {
-        assertEquals(6, revelio.individualAxioms().count());
+        assertEquals(8, revelio.individualAxioms().count());
     }
 
     @Test
@@ -46,9 +45,8 @@ public class RevelioTest {
         assertEquals(3, revelio.annotationAxioms().count());
     }
 
-
     @Test
     public void GetTotalAxiomsTest() {
-        assertEquals(27, revelio.axioms().count());
+        assertEquals(29, revelio.axioms().count());
     }
 }

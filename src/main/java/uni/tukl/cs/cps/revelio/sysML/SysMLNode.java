@@ -27,7 +27,7 @@ public class SysMLNode {
         this.xmiType = getAttributeValue(attributes, Enums.XML_Attribute.XMI_Type.toString());
     }
 
-    protected String getAttributeValue(NamedNodeMap attributes, String attributeId) {
+    String getAttributeValue(NamedNodeMap attributes, String attributeId) {
         if (attributes != null) {
             Node attribute = attributes.getNamedItem(attributeId);
             if (attribute != null) {

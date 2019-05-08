@@ -13,7 +13,8 @@ public class Enums {
         UpperValue("upperValue"),
         Type("type"),
         OwnedComment("ownedComment"),
-        Body("body");
+        Body("body"),
+        End("end");
 
         private String tagName;
 
@@ -38,7 +39,9 @@ public class Enums {
         General("general"),
         Type("type"),
         Value("value"),
-        Href("href");
+        Href("href"),
+        PartWithPort("partWithPort"),
+        Role("role");
 
         private String attributeName;
 
@@ -62,7 +65,8 @@ public class Enums {
         UML_DataType("uml:DataType"),
         UML_LiteralUnlimitedNatural("uml:LiteralUnlimitedNatural"),
         UML_LiteralInteger("uml:LiteralInteger"),
-        UML_Comment("uml:Comment");
+        UML_Comment("uml:Comment"),
+        UML_Connector("uml:Connector");
 
         private String type;
 

@@ -14,7 +14,7 @@ public class OwnedEnd extends SysMLNode {
 
     private LowerValue lowerValue;
 
-    public OwnedEnd(NamedNodeMap attributes) {
+    private OwnedEnd(NamedNodeMap attributes) {
         this.id = getAttributeValue(attributes, Enums.XML_Attribute.XMI_ID.toString());
         this.name = getAttributeValue(attributes, Enums.XML_Attribute.Name.toString());
         this.type = getAttributeValue(attributes, Enums.XML_Attribute.Type.toString());
