@@ -19,23 +19,25 @@ public class Revelio {
 
     /**
      * Create a new instance of Revelio which will parse a SysML file and generate OWL axioms
-     * @param settings Settings for part, port, SysML file path and Ontology URI prefix
+     * @param settings Settings for part, port, SysML file path and Ontology IRI
      * @throws InvalidSysMLFileException
      */
     public Revelio(RevelioSettings settings) throws InvalidSysMLFileException {
         this.parser = new SysMLParser(settings.getFilePath(), settings.getPartClass());
-        this.ontologyManager = new OntologyCreator(settings.getOntologyPrefix(), settings.getPortClass(), parser);
+        this.parser.parse();
+
+        this.ontologyManager = new OntologyCreator(settings.getOntologyIRI(), settings.getPortClass(), settings.getConnectionClass(), parser);
         this.ontologyManager.generateAxioms();
     }
 
     /**
      * Create a new instance of Revelio which will parse a SysML file and generate OWL axioms
      * @param filePath the path to the SysML file
-     * @param ontologyPrefix the prefix for the generated ontology
+     * @param ontologyIRI the IRI for the generated ontology
      * @throws InvalidSysMLFileException
      */
-    public Revelio(String filePath, String ontologyPrefix) throws InvalidSysMLFileException {
-        this(new RevelioSettings(filePath, ontologyPrefix));
+    public Revelio(String filePath, String ontologyIRI) throws InvalidSysMLFileException {
+        this(new RevelioSettings(filePath, ontologyIRI));
     }
 
     /**

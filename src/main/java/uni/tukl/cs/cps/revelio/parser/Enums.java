@@ -17,7 +17,9 @@ public class Enums {
         Body("body"),
         End("end"),
         FullPort("PortsAndFlows:FullPort"),
-        ProxyPort("PortsAndFlows:ProxyPort");
+        ProxyPort("PortsAndFlows:ProxyPort"),
+        FlowPort("PortsAndFlows:FlowPort"),
+        Deprecated_FlowPort("DeprecatedElements:FlowPort");
 
         private String tagName;
 
@@ -46,7 +48,8 @@ public class Enums {
         Href("href"),
         PartWithPort("partWithPort"),
         Role("role"),
-        AnnotatedElement("annotatedElement");
+        AnnotatedElement("annotatedElement"),
+        Direction("direction");
 
         private String attributeName;
 
@@ -89,7 +92,8 @@ public class Enums {
     public enum Relation {
 
         HasPart ("hasPart"),
-        HasPort ("hasPort");
+        HasPort ("hasPort"),
+        IsConnectedTo("isConnectedTo");
 
         private String name;
 
@@ -115,6 +119,32 @@ public class Enums {
         @Override
         public String toString() {
             return dataType;
+        }
+    }
+
+    public enum Port {
+        FlowPort,
+        FullPort,
+        ProxyPort
+    }
+
+    public enum FlowPort {
+        InputFlowPort,
+        OutputFlowPort,
+        InputOutputFlowPort
+    }
+
+    public enum FlowPortDirection {
+        In("in"),
+        Out("out");
+
+        private String direction;
+
+        FlowPortDirection(String direction) { this.direction = direction; }
+
+        @Override
+        public String toString() {
+            return direction;
         }
     }
 }

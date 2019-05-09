@@ -18,23 +18,25 @@ public class OntologyCreator implements IOntologyCreator {
     private final OWLOntologyManager ontologyManager;
     private final OWLDataFactory dataFactory;
 
-    private List<OWLClassAxiom> classAxioms;
-    private List<OWLObjectPropertyAxiom> objectPropertyAxioms;
-    private List<OWLDataPropertyAxiom> dataPropertyAxioms;
-    private List<OWLIndividualAxiom> individualAxioms;
-    private List<OWLAnnotationAxiom> annotationAxioms;
+    private final List<OWLClassAxiom> classAxioms;
+    private final List<OWLObjectPropertyAxiom> objectPropertyAxioms;
+    private final List<OWLDataPropertyAxiom> dataPropertyAxioms;
+    private final List<OWLIndividualAxiom> individualAxioms;
+    private final List<OWLAnnotationAxiom> annotationAxioms;
 
-    private String portClass;
-    private String ontologyPrefix;
-    private Map<String, OWLIndividual> individuals;
+    private final Map<String, OWLIndividual> individuals;
 
-    private ISysMLParser parser;
+    private final String portClass;
+    private final String connectionClass;
+    private final String ontologyIRI;
 
-    public OntologyCreator(String ontologyPrefix, String portClass, ISysMLParser parser) {
+    private final ISysMLParser parser;
+
+    public OntologyCreator(String ontologyIRI, String portClass, String connectionClass, ISysMLParser parser) {
         this.ontologyManager = OWLManager.createOWLOntologyManager();
-        this.dataFactory = ontologyManager.getOWLDataFactory();
-        this.ontologyPrefix = ontologyPrefix;
+        this.ontologyIRI = ontologyIRI;
         this.portClass = portClass;
+        this.connectionClass = connectionClass;
         this.parser = parser;
         this.classAxioms = new ArrayList<>();
         this.objectPropertyAxioms = new ArrayList<>();
@@ -42,6 +44,7 @@ public class OntologyCreator implements IOntologyCreator {
         this.individualAxioms = new ArrayList<>();
         this.annotationAxioms = new ArrayList<>();
         this.individuals = new HashMap<>();
+        this.dataFactory = ontologyManager.getOWLDataFactory();
     }
 
     private OWLObjectProperty getHasPartRelation() {
@@ -52,12 +55,16 @@ public class OntologyCreator implements IOntologyCreator {
         return dataFactory.getOWLObjectProperty(getIRI(Enums.Relation.HasPort.toString()));
     }
 
+    private OWLObjectProperty getIsConnectedToRelation() {
+        return dataFactory.getOWLObjectProperty(getIRI(Enums.Relation.IsConnectedTo.toString()));
+    }
+
     private IRI getDataPropertyIRI(String name) {
         return this.getIRI("has" + name);
     }
 
     private IRI getIRI(String name) {
-        return IRI.create(ontologyPrefix, name);
+        return IRI.create(ontologyIRI, name);
     }
 
     private OWLClass getOWLClass(String name) {
@@ -65,6 +72,7 @@ public class OntologyCreator implements IOntologyCreator {
     }
 
     private OWLAnnotationAxiom getCommentAxiom(String comment, IRI iri) {
+
         OWLLiteral literal = dataFactory.getOWLLiteral(comment);
         OWLAnnotationProperty commentAnnotation = dataFactory.getRDFSComment();
 
@@ -84,13 +92,13 @@ public class OntologyCreator implements IOntologyCreator {
 
             classAxioms.add(axiom);
 
-            getCommentsAxioms(block.getComments(), owlBlockClass.getIRI());
+            addCommentsAxioms(block.getComments(), owlBlockClass.getIRI());
 
-            getBlockAttributesAxioms(block.getAttributes(), owlBlockClass);
+            addBlockAttributesAxioms(block.getAttributes(), owlBlockClass);
 
-            getBlockConnectorsAxioms(block.getConnectors());
+            addBlockConnectorsAxioms(block.getConnectors());
 
-            getBlockPortsAxioms(block.getPorts(), owlBlockClass);
+            addBlockPortsAxioms(block.getPorts(), owlBlockClass);
         }
 
         for (Association association : parser.getAssociations()) {
@@ -106,14 +114,13 @@ public class OntologyCreator implements IOntologyCreator {
         }
     }
 
-
-    private void getCommentsAxioms(List<OwnedComment> comments, IRI iri) {
+    private void addCommentsAxioms(List<OwnedComment> comments, IRI iri) {
         for (OwnedComment comment : comments) {
             annotationAxioms.add(getCommentAxiom(comment.getBody(), iri));
         }
     }
 
-    private void getBlockAttributesAxioms(List<OwnedAttribute> attributes, OWLClass blockClass) {
+    private void addBlockAttributesAxioms(List<OwnedAttribute> attributes, OWLClass blockClass) {
         for (OwnedAttribute attribute : attributes) {
             if (attribute.getDataType() != null) { // data property attribute
 
@@ -136,42 +143,60 @@ public class OntologyCreator implements IOntologyCreator {
 
                 individualAxioms.add(dataFactory.getOWLClassAssertionAxiom(individualType, individual));
 
-                getCommentsAxioms(attribute.getComments(), individual.getIRI());
+                addCommentsAxioms(attribute.getComments(), individual.getIRI());
             }
         }
     }
 
-    private void getBlockPortsAxioms(List<Port> ports, OWLClass block) {
+    private void addBlockPortsAxioms(List<Port> ports, OWLClass block) {
         for (Port port : ports) {
-
-            OWLClass owlPort = getOWLClass(port.getName());
-            OWLClass owlParentClass = getOWLClass(port.getSuperClass());
+            OWLClass owlParentClass = getOWLClass(port.getSuperClass().toString());
             OWLClass owlPortClass = getOWLClass(portClass);
-            OWLClassExpression classExpression = dataFactory.getOWLObjectSomeValuesFrom(getHasPortRelation(), owlPort);
+            OWLClassExpression classExpression = dataFactory.getOWLObjectSomeValuesFrom(getHasPortRelation(), owlPortClass);
 
             classAxioms.add(dataFactory.getOWLSubClassOfAxiom(owlParentClass, owlPortClass));
-            classAxioms.add(dataFactory.getOWLSubClassOfAxiom(owlPort, owlParentClass));
             classAxioms.add(dataFactory.getOWLSubClassOfAxiom(block, classExpression));
         }
     }
 
-    private void getHasPortAxiom(End end) {
+    private OWLIndividual addHasPortAxiom(End end) {
         Port port = parser.getPortMap().get(end.getRole());
 
         OWLIndividual partWithPort = individuals.get(end.getPartWithPort());
         OWLIndividual portIndividual = dataFactory.getOWLNamedIndividual(port.getName());
-        OWLClass individualType = getOWLClass(port.getSuperClass());
+        OWLClass portType = getOWLClass(port.getSuperClass().toString());
 
-        individualAxioms.add(dataFactory.getOWLClassAssertionAxiom(individualType, portIndividual));
+        if (port.getSuperClass() == Enums.Port.FlowPort) {
+            OWLClass parentPortType = portType;
+
+            if (Enums.FlowPortDirection.In.toString().equals(port.getDirection())) {
+                portType = getOWLClass(Enums.FlowPort.InputFlowPort.toString());
+            } else if (Enums.FlowPortDirection.Out.toString().equals(port.getDirection())) {
+                portType = getOWLClass(Enums.FlowPort.OutputFlowPort.toString());
+            } else {
+                portType = getOWLClass(Enums.FlowPort.InputOutputFlowPort.toString());
+            }
+
+            classAxioms.add(dataFactory.getOWLSubClassOfAxiom(portType, parentPortType));
+        }
+
+        individualAxioms.add(dataFactory.getOWLClassAssertionAxiom(portType, portIndividual));
         individualAxioms.add(dataFactory.getOWLObjectPropertyAssertionAxiom(getHasPortRelation(), partWithPort, portIndividual));
+
+        return portIndividual;
     }
 
-    private void getBlockConnectorsAxioms(List<OwnedConnector> connectors) {
+    private void addBlockConnectorsAxioms(List<OwnedConnector> connectors) {
         for (OwnedConnector connector : connectors) {
             if (connector.getFirstEnd().getPartWithPort() != null && connector.getSecondEnd().getPartWithPort() != null) {
 
-                getHasPortAxiom(connector.getFirstEnd());
-                getHasPortAxiom(connector.getSecondEnd());
+                OWLIndividual firstPort = addHasPortAxiom(connector.getFirstEnd());
+                OWLIndividual secondPort = addHasPortAxiom(connector.getSecondEnd());
+                OWLIndividual connection = dataFactory.getOWLNamedIndividual(getConnectionName(connector));
+
+                individualAxioms.add(dataFactory.getOWLClassAssertionAxiom(getOWLClass(connectionClass), connection));
+                individualAxioms.add(dataFactory.getOWLObjectPropertyAssertionAxiom(getIsConnectedToRelation(), connection, firstPort));
+                individualAxioms.add(dataFactory.getOWLObjectPropertyAssertionAxiom(getIsConnectedToRelation(), connection, secondPort));
 
             } else {
 
@@ -181,6 +206,12 @@ public class OntologyCreator implements IOntologyCreator {
                 individualAxioms.add(dataFactory.getOWLObjectPropertyAssertionAxiom(getHasPartRelation(), firstIndividual, secondIndividual));
             }
         }
+    }
+
+    private String getConnectionName(OwnedConnector connector) {
+        return parser.getPortMap().get(connector.getFirstEnd().getRole()).getName()
+                + "_" +
+                parser.getPortMap().get(connector.getSecondEnd().getRole()).getName();
     }
 
     private OWLClassExpression getOWLClassExpression(Association association, OWLClass owlOwnedClass) {
@@ -230,6 +261,7 @@ public class OntologyCreator implements IOntologyCreator {
     }
 
     public Stream<OWLAxiom> axioms() {
+
         List<OWLAxiom> axioms = new ArrayList<>();
 
         axioms.addAll(classAxioms);

@@ -6,6 +6,8 @@ public class SysMLTag  {
 
     private String tagName;
 
+    private String direction;
+
     public SysMLTag (String tagName, String base) {
         this.tagName = tagName;
         this.base = base;
@@ -25,5 +27,13 @@ public class SysMLTag  {
 
     public void setBase(String base) {
         this.base = base;
+    }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
     }
 }

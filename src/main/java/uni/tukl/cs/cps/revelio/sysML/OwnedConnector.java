@@ -10,12 +10,13 @@ public class OwnedConnector extends SysMLNode {
 
     private End secondEnd;
 
-    public OwnedConnector(NodeList childNodes) {
+    public OwnedConnector(Node node) {
+
+        this.name = getAttributeValue(node.getAttributes(), Enums.XML_Attribute.Name.toString());
 
         boolean firstChild = true;
-
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node child = childNodes.item(i);
+        for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+            Node child = node.getChildNodes().item(i);
             if (child.getNodeName() == Enums.XML_Tag.End.toString()) {
                 if (firstChild) {
                     this.firstEnd = new End(child);

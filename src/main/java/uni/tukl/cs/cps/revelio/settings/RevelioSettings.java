@@ -4,11 +4,13 @@ public class RevelioSettings {
 
     private String filePath;
 
-    private String ontologyPrefix;
+    private String ontologyIRI;
 
     private String partClass;
 
     private String portClass;
+
+    private String connectionClass;
 
     /**
      * Create a new Revelio Settings instance with default values for Part and Port classes
@@ -16,25 +18,27 @@ public class RevelioSettings {
     public RevelioSettings() {
         this.partClass = "Part";
         this.portClass = "Port";
+        this.connectionClass =  "Connection";
     }
 
     /**
      * Create a new Revelio Settings instance with default values for Part and Port classes
      */
-    public RevelioSettings(String filePath, String ontologyPrefix) {
+    public RevelioSettings(String filePath, String ontologyIRI) {
         this();
         this.filePath = filePath;
-        this.ontologyPrefix = ontologyPrefix;
+        this.ontologyIRI = ontologyIRI;
     }
 
     /**
      * Create a new Revelio Settings instance with custom values for Part and Port classes
      */
-    public RevelioSettings(String filePath, String ontologyPrefix, String partClass, String portClass) {
+    public RevelioSettings(String filePath, String ontologyIRI, String partClass, String portClass, String connectionClass) {
         this.filePath = filePath;
-        this.ontologyPrefix = ontologyPrefix;
+        this.ontologyIRI = ontologyIRI;
         this.partClass = partClass;
         this.portClass = portClass;
+        this.connectionClass = connectionClass;
     }
 
     /**
@@ -54,11 +58,19 @@ public class RevelioSettings {
     }
 
     /**
-     * The URI ontology prefix
-     * @return ontology prefix
+     * The root class that will have SysML connections between ports as sub classes
+     * @return part class
      */
-    public String getOntologyPrefix() {
-        return ontologyPrefix;
+    public String getConnectionClass() {
+        return connectionClass;
+    }
+
+    /**
+     * The ontology IRI
+     * @return ontology IRI
+     */
+    public String getOntologyIRI() {
+        return ontologyIRI;
     }
 
     /**

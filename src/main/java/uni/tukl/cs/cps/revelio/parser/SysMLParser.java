@@ -1,6 +1,8 @@
 package uni.tukl.cs.cps.revelio.parser;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import uni.tukl.cs.cps.revelio.exceptions.InvalidSysMLFileException;
@@ -24,20 +26,20 @@ public class SysMLParser implements ISysMLParser {
     private Map<String, Port> portMap;
 
     private List<Association> associations;
+    private Document doc;
 
     public SysMLParser(String filePath, String rootClass) throws InvalidSysMLFileException {
 
         this.associations = new ArrayList<>();
         this.attributeMap = new HashMap<>();
 
-        Document doc = null;
-
         try {
-            File file = new File(filePath);
 
+            File file = new File(filePath);
             DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            doc = dBuilder.parse(file);
-            if(!doc.getDocumentElement().getNodeName().equals(Enums.XML_Tag.XMI.toString())) {
+            this.doc = dBuilder.parse(file);
+
+            if (!doc.getDocumentElement().getNodeName().equals(Enums.XML_Tag.XMI.toString())) {
                 throw new InvalidSysMLFileException("The file provided is not a valid XMI file.");
             }
 
@@ -45,19 +47,23 @@ public class SysMLParser implements ISysMLParser {
                     .map(t -> new Block(t.getBase(), rootClass)).collect(Collectors.toMap(Block::getId, block -> block));
 
             portMap = parseNodesByTag(doc, Enums.XML_Tag.FullPort.toString()).stream()
-                    .map(t -> new Port(t.getBase(), t.getTagName())).collect(Collectors.toMap(Port::getId, port -> port));
+                    .map(t -> new Port(t.getBase(), Enums.Port.FullPort)).collect(Collectors.toMap(Port::getId, port -> port));
 
             portMap.putAll(parseNodesByTag(doc, Enums.XML_Tag.ProxyPort.toString()).stream()
-                    .map(t -> new Port(t.getBase(), t.getTagName())).collect(Collectors.toMap(Port::getId, port -> port)));
+                    .map(t -> new Port(t.getBase(), Enums.Port.ProxyPort)).collect(Collectors.toMap(Port::getId, port -> port)));
 
-            parseBlockDiagram(doc);
+            portMap.putAll(parseNodesByTag(doc, Enums.XML_Tag.FlowPort.toString()).stream()
+                    .map(t -> new Port(t.getBase(), Enums.Port.FlowPort, t.getDirection())).collect(Collectors.toMap(Port::getId, port -> port)));
+
+            portMap.putAll(parseNodesByTag(doc, Enums.XML_Tag.Deprecated_FlowPort.toString()).stream()
+                    .map(t -> new Port(t.getBase(), Enums.Port.FlowPort, t.getDirection())).collect(Collectors.toMap(Port::getId, port -> port)));
 
         } catch (ParserConfigurationException | IOException | SAXException ex) {
             throw new InvalidSysMLFileException(ex);
         }
     }
 
-    private void parseBlockDiagram(Document doc) {
+    public void parse() {
 
         NodeList packagedElements = doc.getElementsByTagName(Enums.XML_Tag.PackagedElement.toString());
         for (int i = 0; i < packagedElements.getLength(); i++) {
@@ -90,6 +96,7 @@ public class SysMLParser implements ISysMLParser {
     }
 
     private void parseBlock(PackagedElement packagedElement) {
+
         Block block = blockMap.get(packagedElement.getId());
         block.setName(packagedElement.getName());
 
@@ -117,7 +124,7 @@ public class SysMLParser implements ISysMLParser {
 
                 } else if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Connector.toString())) {
 
-                    block.getConnectors().add(new OwnedConnector(packagedElement.getChildNodes().item(i).getChildNodes()));
+                    block.getConnectors().add(new OwnedConnector(packagedElement.getChildNodes().item(i)));
 
                 } else if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Port.toString())) {
 
@@ -137,6 +144,7 @@ public class SysMLParser implements ISysMLParser {
         List<SysMLTag> tags = new ArrayList<>();
 
         for (int i = 0; i < nodeBlocks.getLength(); i++) {
+
             SysMLTag tag = null;
 
             if (tagName.equals(Enums.XML_Tag.BlockDiagram.toString())) {
@@ -145,6 +153,12 @@ public class SysMLParser implements ISysMLParser {
                 tag = new SysMLTag(tagName, nodeBlocks.item(i).getAttributes().getNamedItem(Enums.XML_Attribute.BaseProperty.toString()).getNodeValue());
             } else if (tagName.equals(Enums.XML_Tag.FullPort.toString()) || tagName.equals(Enums.XML_Tag.ProxyPort.toString())) {
                 tag = new SysMLTag(tagName, nodeBlocks.item(i).getAttributes().getNamedItem(Enums.XML_Attribute.BasePort.toString()).getNodeValue());
+            } else if (tagName.equals(Enums.XML_Tag.Deprecated_FlowPort.toString()) || tagName.equals(Enums.XML_Tag.FlowPort.toString())) {
+                tag = new SysMLTag(tagName, nodeBlocks.item(i).getAttributes().getNamedItem(Enums.XML_Attribute.BasePort.toString()).getNodeValue());
+                Node direction  = nodeBlocks.item(i).getAttributes().getNamedItem(Enums.XML_Attribute.Direction.toString());
+                if (direction != null) {
+                    tag.setDirection(direction.getNodeValue());
+                }
             }
 
             if (tag != null) {
@@ -156,6 +170,7 @@ public class SysMLParser implements ISysMLParser {
     }
 
     private List<Association> parseAssociation(PackagedElement packagedElement) {
+
         OwnedEnd owner = null;
         OwnedEnd owned = null;
 

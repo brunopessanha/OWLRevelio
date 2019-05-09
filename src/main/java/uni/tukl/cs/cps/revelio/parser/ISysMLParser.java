@@ -14,4 +14,6 @@ public interface ISysMLParser {
     Map<String, Port> getPortMap();
 
     List<Association> getAssociations();
+
+    void parse();
 }

@@ -9,11 +9,19 @@ public class Port extends SysMLNode {
 
     private OWL2Datatype dataType;
 
-    private String superClass;
+    private Enums.Port superClass;
 
-    public Port(String port, String superClass) {
+    private String direction;
+
+    public Port(String port, Enums.Port superClass) {
         this.id = port;
         this.superClass = superClass;
+    }
+
+    public Port(String port, Enums.Port superClass, String direction) {
+        this.id = port;
+        this.superClass = superClass;
+        this.direction = direction;
     }
 
     public OWL2Datatype getDataType() {
@@ -39,7 +47,11 @@ public class Port extends SysMLNode {
         }
     }
 
-    public String getSuperClass() {
+    public Enums.Port getSuperClass() {
         return superClass;
+    }
+
+    public String getDirection() {
+        return direction;
     }
 }

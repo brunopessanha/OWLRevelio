@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xmi:XMI xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Blocks="http://www.eclipse.org/papyrus/sysml/1.4/SysML/Blocks" xmlns:PortsAndFlows="http://www.eclipse.org/papyrus/sysml/1.4/SysML/PortsAndFlows" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xsi:schemaLocation="http://www.eclipse.org/papyrus/sysml/1.4/SysML/Blocks http://www.eclipse.org/papyrus/sysml/1.4/SysML#//blocks http://www.eclipse.org/papyrus/sysml/1.4/SysML/PortsAndFlows http://www.eclipse.org/papyrus/sysml/1.4/SysML#//portsandflows">
+<xmi:XMI xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Blocks="http://www.eclipse.org/papyrus/sysml/1.4/SysML/Blocks" xmlns:DeprecatedElements="http://www.eclipse.org/papyrus/sysml/1.4/SysML/DeprecatedElements" xmlns:PortsAndFlows="http://www.eclipse.org/papyrus/sysml/1.4/SysML/PortsAndFlows" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xsi:schemaLocation="http://www.eclipse.org/papyrus/sysml/1.4/SysML/Blocks http://www.eclipse.org/papyrus/sysml/1.4/SysML#//blocks http://www.eclipse.org/papyrus/sysml/1.4/SysML/DeprecatedElements http://www.eclipse.org/papyrus/sysml/1.4/SysML#//deprecatedelements http://www.eclipse.org/papyrus/sysml/1.4/SysML/PortsAndFlows http://www.eclipse.org/papyrus/sysml/1.4/SysML#//portsandflows">
   <uml:Model xmi:id="_VQpsgGdNEemtVcDczo78AQ" name="TestSysML">
     <packageImport xmi:type="uml:PackageImport" xmi:id="_VYmHkGdNEemtVcDczo78AQ">
       <importedPackage xmi:type="uml:Model" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#_0"/>
@@ -11,7 +11,7 @@
       <ownedComment xmi:type="uml:Comment" xmi:id="_7LTnEG2pEemtVcDczo78AQ">
         <body>This is a comment</body>
       </ownedComment>
-      <ownedComment xmi:type="uml:Comment" xmi:id="_vdqM0G2sEemtVcDczo78AQ">
+      <ownedComment xmi:type="uml:Comment" xmi:id="_vdqM0G2sEemtVcDczo78AQ" annotatedElement="_VZ-iIG2kEemtVcDczo78AQ">
         <body>Another Comment</body>
       </ownedComment>
       <ownedComment xmi:type="uml:Comment" xmi:id="_0-_HYG2sEemtVcDczo78AQ" annotatedElement="_r-FGsGdNEemtVcDczo78AQ">
@@ -26,13 +26,17 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_WuO_UG2kEemtVcDczo78AQ" name="pump" type="_7NKgAGdNEemtVcDczo78AQ"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_wm1VAG2kEemtVcDczo78AQ" name="tank_bio" type="_8mPLwGdNEemtVcDczo78AQ"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_zzLVMG2kEemtVcDczo78AQ" name="tank_petrol" type="_8mPLwGdNEemtVcDczo78AQ"/>
-      <ownedConnector xmi:type="uml:Connector" xmi:id="_LvIGEG2nEemtVcDczo78AQ" name="BindingConnector8">
+      <ownedConnector xmi:type="uml:Connector" xmi:id="_LvIGEG2nEemtVcDczo78AQ" name="Pump_Tank_Bio_Connector">
         <end xmi:type="uml:ConnectorEnd" xmi:id="_LvLwcG2nEemtVcDczo78AQ" partWithPort="_wm1VAG2kEemtVcDczo78AQ" role="_ImndAG2nEemtVcDczo78AQ"/>
         <end xmi:type="uml:ConnectorEnd" xmi:id="_LvLwcW2nEemtVcDczo78AQ" partWithPort="_WuO_UG2kEemtVcDczo78AQ" role="_J7rygG2nEemtVcDczo78AQ"/>
       </ownedConnector>
-      <ownedConnector xmi:type="uml:Connector" xmi:id="_MgNkwG2nEemtVcDczo78AQ" name="BindingConnector9">
+      <ownedConnector xmi:type="uml:Connector" xmi:id="_MgNkwG2nEemtVcDczo78AQ" name="Pump_Tank_Petrol_Connector">
         <end xmi:type="uml:ConnectorEnd" xmi:id="_MgQoEG2nEemtVcDczo78AQ" partWithPort="_zzLVMG2kEemtVcDczo78AQ" role="_KWoCEG2nEemtVcDczo78AQ"/>
         <end xmi:type="uml:ConnectorEnd" xmi:id="_MgQoEW2nEemtVcDczo78AQ" partWithPort="_WuO_UG2kEemtVcDczo78AQ" role="_J7rygG2nEemtVcDczo78AQ"/>
+      </ownedConnector>
+      <ownedConnector xmi:type="uml:Connector" xmi:id="_TF6NkHJhEemdmYprZWtSxA" name="Connector13">
+        <end xmi:type="uml:ConnectorEnd" xmi:id="_TF7bsHJhEemdmYprZWtSxA" partWithPort="_T1WtsG2kEemtVcDczo78AQ" role="_z6CAYHJgEemdmYprZWtSxA"/>
+        <end xmi:type="uml:ConnectorEnd" xmi:id="_TF8CwHJhEemdmYprZWtSxA" partWithPort="_RHxtIG2kEemtVcDczo78AQ" role="_uXoHwHJgEemdmYprZWtSxA"/>
       </ownedConnector>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_x-X1MGdNEemtVcDczo78AQ" name="Engine">
@@ -42,8 +46,11 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_kwZvAG2jEemtVcDczo78AQ" name="Power">
         <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Real"/>
       </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Port" xmi:id="_uXoHwHJgEemdmYprZWtSxA" name="FlowPort3" aggregation="composite"/>
     </packagedElement>
-    <packagedElement xmi:type="uml:Class" xmi:id="_zsBCwGdNEemtVcDczo78AQ" name="FuelSystem"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_zsBCwGdNEemtVcDczo78AQ" name="FuelSystem">
+      <ownedAttribute xmi:type="uml:Port" xmi:id="_z6CAYHJgEemdmYprZWtSxA" name="FlowPort2" aggregation="composite"/>
+    </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_1fbhIGdNEemtVcDczo78AQ" name="Frame"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_7NKgAGdNEemtVcDczo78AQ" name="Pump">
       <ownedAttribute xmi:type="uml:Port" xmi:id="_J7rygG2nEemtVcDczo78AQ" name="FullPort1" aggregation="composite">
@@ -51,7 +58,7 @@
       </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_8mPLwGdNEemtVcDczo78AQ" name="Tank">
-      <ownedAttribute xmi:type="uml:Port" xmi:id="_ImndAG2nEemtVcDczo78AQ" name="FullPort1" aggregation="composite">
+      <ownedAttribute xmi:type="uml:Port" xmi:id="_ImndAG2nEemtVcDczo78AQ" name="FlowPort1" aggregation="composite">
         <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Real"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Port" xmi:id="_KWoCEG2nEemtVcDczo78AQ" name="FullPort2" aggregation="composite">
@@ -175,5 +182,9 @@
   <Blocks:NestedConnectorEnd xmi:id="_MgRPIW2nEemtVcDczo78AQ" base_Element="_MgQoEW2nEemtVcDczo78AQ" propertyPath="_WuO_UG2kEemtVcDczo78AQ" base_ConnectorEnd="_MgQoEW2nEemtVcDczo78AQ"/>
   <Blocks:BindingConnector xmi:id="_MgRPIm2nEemtVcDczo78AQ" base_Connector="_MgNkwG2nEemtVcDczo78AQ"/>
   <PortsAndFlows:ProxyPort xmi:id="_vJxj8HJAEemdmYprZWtSxA" base_Port="_KWoCEG2nEemtVcDczo78AQ"/>
-  <PortsAndFlows:FullPort xmi:id="_EiWEAHJBEemdmYprZWtSxA" base_Port="_ImndAG2nEemtVcDczo78AQ"/>
+  <DeprecatedElements:FlowPort xmi:id="_ukMTMHJXEemdmYprZWtSxA" base_Port="_ImndAG2nEemtVcDczo78AQ"/>
+  <DeprecatedElements:FlowPort xmi:id="_uXxRsHJgEemdmYprZWtSxA" base_Port="_uXoHwHJgEemdmYprZWtSxA" direction="in"/>
+  <DeprecatedElements:FlowPort xmi:id="_z6G44HJgEemdmYprZWtSxA" base_Port="_z6CAYHJgEemdmYprZWtSxA" direction="out"/>
+  <Blocks:NestedConnectorEnd xmi:id="_TF8CwXJhEemdmYprZWtSxA" base_Element="_TF7bsHJhEemdmYprZWtSxA" propertyPath="_T1WtsG2kEemtVcDczo78AQ" base_ConnectorEnd="_TF7bsHJhEemdmYprZWtSxA"/>
+  <Blocks:NestedConnectorEnd xmi:id="_TF8p0HJhEemdmYprZWtSxA" base_Element="_TF8CwHJhEemdmYprZWtSxA" propertyPath="_RHxtIG2kEemtVcDczo78AQ" base_ConnectorEnd="_TF8CwHJhEemdmYprZWtSxA"/>
 </xmi:XMI>
