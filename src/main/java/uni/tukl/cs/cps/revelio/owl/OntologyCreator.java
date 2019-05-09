@@ -45,6 +45,7 @@ public class OntologyCreator implements IOntologyCreator {
         this.annotationAxioms = new ArrayList<>();
         this.individuals = new HashMap<>();
         this.dataFactory = ontologyManager.getOWLDataFactory();
+        this.objectPropertyAxioms.add(dataFactory.getOWLSymmetricObjectPropertyAxiom(getIsConnectedToRelation()));
     }
 
     private OWLObjectProperty getHasPartRelation() {

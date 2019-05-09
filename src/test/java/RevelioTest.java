@@ -47,6 +47,11 @@ public class RevelioTest {
 
     @Test
     public void GetTotalAxiomsTest() {
-        assertEquals(63, revelio.axioms().count());
+        assertEquals(64, revelio.axioms().count());
+    }
+
+    @Test
+    public void GetObjectPropertyAxiomsTest() {
+        assertEquals(1, revelio.objectPropertyAxioms().count());
     }
 }
