@@ -3,6 +3,7 @@ package uni.tukl.cs.cps.revelio.parser;
 public class Enums {
 
     public enum XML_Tag {
+
         XMI("xmi:XMI"),
         BlockDiagram("Blocks:Block"),
         ParticipantProperty("Blocks:ParticipantProperty"),
@@ -15,7 +16,8 @@ public class Enums {
         OwnedComment("ownedComment"),
         Body("body"),
         End("end"),
-        FullPort("PortsAndFlows:FullPort");
+        FullPort("PortsAndFlows:FullPort"),
+        ProxyPort("PortsAndFlows:ProxyPort");
 
         private String tagName;
 
@@ -100,6 +102,7 @@ public class Enums {
     }
 
     public enum DataType {
+
         Real ("Real"),
         Integer ("Integer"),
         String("String"),

@@ -9,8 +9,11 @@ public class Port extends SysMLNode {
 
     private OWL2Datatype dataType;
 
-    public Port(String port) {
+    private String superClass;
+
+    public Port(String port, String superClass) {
         this.id = port;
+        this.superClass = superClass;
     }
 
     public OWL2Datatype getDataType() {
@@ -37,6 +40,6 @@ public class Port extends SysMLNode {
     }
 
     public String getSuperClass() {
-        return "Port";
+        return superClass;
     }
 }

@@ -1,7 +1,6 @@
 package uni.tukl.cs.cps.revelio.sysML;
 
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import uni.tukl.cs.cps.revelio.parser.Enums;
 
 public class OwnedComment extends SysMLNode {

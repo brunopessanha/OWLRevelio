@@ -167,13 +167,13 @@
   <Blocks:Block xmi:id="_7NOxcGdNEemtVcDczo78AQ" base_Class="_7NKgAGdNEemtVcDczo78AQ"/>
   <Blocks:Block xmi:id="_8mTdMGdNEemtVcDczo78AQ" base_Class="_8mPLwGdNEemtVcDczo78AQ"/>
   <Blocks:Block xmi:id="_zehwkGgiEemtVcDczo78AQ" base_Class="_zedfIGgiEemtVcDczo78AQ"/>
-  <PortsAndFlows:FullPort xmi:id="_ImrucG2nEemtVcDczo78AQ" base_Port="_ImndAG2nEemtVcDczo78AQ"/>
   <PortsAndFlows:FullPort xmi:id="_J7u10G2nEemtVcDczo78AQ" base_Port="_J7rygG2nEemtVcDczo78AQ"/>
-  <PortsAndFlows:FullPort xmi:id="_KWrscG2nEemtVcDczo78AQ" base_Port="_KWoCEG2nEemtVcDczo78AQ"/>
   <Blocks:NestedConnectorEnd xmi:id="_LvLwcm2nEemtVcDczo78AQ" base_Element="_LvLwcG2nEemtVcDczo78AQ" propertyPath="_wm1VAG2kEemtVcDczo78AQ" base_ConnectorEnd="_LvLwcG2nEemtVcDczo78AQ"/>
   <Blocks:NestedConnectorEnd xmi:id="_LvMXgG2nEemtVcDczo78AQ" base_Element="_LvLwcW2nEemtVcDczo78AQ" propertyPath="_WuO_UG2kEemtVcDczo78AQ" base_ConnectorEnd="_LvLwcW2nEemtVcDczo78AQ"/>
   <Blocks:BindingConnector xmi:id="_LvMXgW2nEemtVcDczo78AQ" base_Connector="_LvIGEG2nEemtVcDczo78AQ"/>
   <Blocks:NestedConnectorEnd xmi:id="_MgRPIG2nEemtVcDczo78AQ" base_Element="_MgQoEG2nEemtVcDczo78AQ" propertyPath="_zzLVMG2kEemtVcDczo78AQ" base_ConnectorEnd="_MgQoEG2nEemtVcDczo78AQ"/>
   <Blocks:NestedConnectorEnd xmi:id="_MgRPIW2nEemtVcDczo78AQ" base_Element="_MgQoEW2nEemtVcDczo78AQ" propertyPath="_WuO_UG2kEemtVcDczo78AQ" base_ConnectorEnd="_MgQoEW2nEemtVcDczo78AQ"/>
   <Blocks:BindingConnector xmi:id="_MgRPIm2nEemtVcDczo78AQ" base_Connector="_MgNkwG2nEemtVcDczo78AQ"/>
+  <PortsAndFlows:ProxyPort xmi:id="_vJxj8HJAEemdmYprZWtSxA" base_Port="_KWoCEG2nEemtVcDczo78AQ"/>
+  <PortsAndFlows:FullPort xmi:id="_EiWEAHJBEemdmYprZWtSxA" base_Port="_ImndAG2nEemtVcDczo78AQ"/>
 </xmi:XMI>

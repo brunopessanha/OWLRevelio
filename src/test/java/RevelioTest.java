@@ -14,7 +14,7 @@ public class RevelioTest {
 
     @Before
     public void setUp() throws Exception {
-        revelio = new Revelio(sysMLFilePath, "http://www.semanticweb.org/revelio/test-ontology/", "Part");
+        revelio = new Revelio(sysMLFilePath, "http://www.semanticweb.org/revelio/test-ontology/");
     }
 
     @After
@@ -27,7 +27,7 @@ public class RevelioTest {
 
     @Test
     public void GetClassAxiomsTest() {
-        assertEquals(21, revelio.classAxioms().count());
+        assertEquals(24, revelio.classAxioms().count());
     }
 
     @Test
@@ -37,7 +37,7 @@ public class RevelioTest {
 
     @Test
     public void GetIndividualAxiomsTest() {
-        assertEquals(10, revelio.individualAxioms().count());
+        assertEquals(14, revelio.individualAxioms().count());
     }
 
     @Test
@@ -47,6 +47,6 @@ public class RevelioTest {
 
     @Test
     public void GetTotalAxiomsTest() {
-        assertEquals(38, revelio.axioms().count());
+        assertEquals(45, revelio.axioms().count());
     }
 }
