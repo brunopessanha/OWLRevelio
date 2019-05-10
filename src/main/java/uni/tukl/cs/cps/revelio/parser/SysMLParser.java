@@ -66,17 +66,26 @@ public class SysMLParser implements ISysMLParser {
     public void parse() {
 
         NodeList packagedElements = doc.getElementsByTagName(Enums.XML_Tag.PackagedElement.toString());
+
+        // First we parse all the block names and associations
         for (int i = 0; i < packagedElements.getLength(); i++) {
-
             PackagedElement packagedElement = new PackagedElement(packagedElements.item(i).getAttributes(), packagedElements.item(i).getChildNodes());
-
             if (packagedElement.getType().equals(Enums.XMI_Type.UML_Class.toString()) && blockMap.containsKey(packagedElement.getId())) {
-                parseBlock(packagedElement);
+                parseBlockName(packagedElement);
             } else if (packagedElement.getType().equals(Enums.XMI_Type.UML_Association.toString())) {
                 associations.addAll(parseAssociation(packagedElement));
             }
         }
 
+        // Now we parse all the block attributes. It is necessary to have two loops as we want to make sure that the block super class name is present this iteration
+        for (int i = 0; i < packagedElements.getLength(); i++) {
+            PackagedElement packagedElement = new PackagedElement(packagedElements.item(i).getAttributes(), packagedElements.item(i).getChildNodes());
+            if (packagedElement.getType().equals(Enums.XMI_Type.UML_Class.toString()) && blockMap.containsKey(packagedElement.getId())) {
+                parseBlock(packagedElement);
+            }
+        }
+
+        // Parse global comments
         NodeList ownedComments = doc.getElementsByTagName(Enums.XML_Tag.OwnedComment.toString());
         for (int i = 0; i < ownedComments.getLength(); i++) {
             OwnedComment ownedComment = new OwnedComment(ownedComments.item(i));
@@ -95,10 +104,13 @@ public class SysMLParser implements ISysMLParser {
         }
     }
 
-    private void parseBlock(PackagedElement packagedElement) {
-
+    private void parseBlockName(PackagedElement packagedElement) {
         Block block = blockMap.get(packagedElement.getId());
         block.setName(packagedElement.getName());
+    }
+
+    private void parseBlock(PackagedElement packagedElement) {
+        Block block = blockMap.get(packagedElement.getId());
 
         for (int i = 0; i < packagedElement.getChildNodes().getLength(); i++) {
 
@@ -108,7 +120,7 @@ public class SysMLParser implements ISysMLParser {
 
                 if (childNode.getXmiType().equals(Enums.XMI_Type.UML_Property.toString())) {
 
-                    OwnedAttribute attribute = new OwnedAttribute(childNode, packagedElement.getChildNodes().item(i).getChildNodes());
+                    OwnedAttribute attribute = new OwnedAttribute(packagedElement.getChildNodes().item(i));
                     block.getAttributes().add(attribute);
                     attributeMap.put(attribute.getId(), attribute);
 

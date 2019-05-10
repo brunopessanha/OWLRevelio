@@ -2,7 +2,6 @@ package uni.tukl.cs.cps.revelio.sysML;
 
 import org.semanticweb.owlapi.vocab.OWL2Datatype;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import uni.tukl.cs.cps.revelio.parser.Enums;
 
 import java.util.ArrayList;
@@ -14,16 +13,19 @@ public class OwnedAttribute extends SysMLNode {
 
     private List<OwnedComment> comments;
 
-    public OwnedAttribute(SysMLNode node, NodeList childNodes) {
-        this.id = node.id;
-        this.name = node.name;
-        this.xmiType = node.xmiType;
-        this.type = node.type;
+    private String association;
+
+    public OwnedAttribute(Node node) {
+        this.id = getAttributeValue(node.getAttributes(), Enums.XML_Attribute.XMI_ID.toString());
+        this.name = getAttributeValue(node.getAttributes(), Enums.XML_Attribute.Name.toString());
+        this.type = getAttributeValue(node.getAttributes(), Enums.XML_Attribute.Type.toString());
+        this.xmiType = getAttributeValue(node.getAttributes(), Enums.XML_Attribute.XMI_Type.toString());
+        this.association = getAttributeValue(node.getAttributes(), Enums.XML_Attribute.Association.toString());
         this.comments = new ArrayList<>();
 
         if (type == null) {
-            for (int i = 0; i < childNodes.getLength(); i++) {
-                Node child = childNodes.item(i);
+            for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                Node child = node.getChildNodes().item(i);
                 if (child.getNodeName() == Enums.XML_Tag.Type.toString()) {
                     String composedDataType = getAttributeValue(child.getAttributes(), Enums.XML_Attribute.Href.toString());
                     if (composedDataType != null) {
@@ -51,5 +53,13 @@ public class OwnedAttribute extends SysMLNode {
 
     public List<OwnedComment> getComments() {
         return comments;
+    }
+
+    public String getAssociation() {
+        return association;
+    }
+
+    public void setAssociation(String association) {
+        this.association = association;
     }
 }

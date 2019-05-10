@@ -18,7 +18,7 @@ public class Enums {
         End("end"),
         FullPort("PortsAndFlows:FullPort"),
         ProxyPort("PortsAndFlows:ProxyPort"),
-        FlowPort("PortsAndFlows:FlowPort"),
+        FlowPort("PortAndFlows:FlowPort"),
         Deprecated_FlowPort("DeprecatedElements:FlowPort");
 
         private String tagName;
@@ -49,7 +49,8 @@ public class Enums {
         PartWithPort("partWithPort"),
         Role("role"),
         AnnotatedElement("annotatedElement"),
-        Direction("direction");
+        Direction("direction"),
+        Association("association");
 
         private String attributeName;
 

@@ -13,6 +13,7 @@ public class OwnedConnector extends SysMLNode {
     public OwnedConnector(Node node) {
 
         this.name = getAttributeValue(node.getAttributes(), Enums.XML_Attribute.Name.toString());
+        this.id = getAttributeValue(node.getAttributes(), Enums.XML_Attribute.XMI_ID.toString());
 
         boolean firstChild = true;
         for (int i = 0; i < node.getChildNodes().getLength(); i++) {
