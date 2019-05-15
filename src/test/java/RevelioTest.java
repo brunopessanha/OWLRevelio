@@ -1,7 +1,7 @@
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import uni.tukl.cs.cps.revelio.Revelio;
+import com.github.brunopessanha.revelio.Revelio;
 
 import java.io.File;
 
