@@ -1,9 +1,12 @@
+import com.github.brunopessanha.revelio.settings.RevelioSettings;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import com.github.brunopessanha.revelio.Revelio;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 import static org.junit.Assert.*;
 
@@ -14,7 +17,10 @@ public class RevelioTest {
 
     @Before
     public void setUp() throws Exception {
-        revelio = new Revelio(sysMLFilePath, "http://www.semanticweb.org/revelio/test-ontology/");
+
+        InputStream file = new FileInputStream(sysMLFilePath);
+        revelio = new Revelio(new RevelioSettings(file, "http://www.semanticweb.org/revelio/test-ontology/", "partOf_directly"));
+        file.close();
     }
 
     @After

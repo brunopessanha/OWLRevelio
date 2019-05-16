@@ -92,7 +92,6 @@ public class Enums {
 
     public enum Relation {
 
-        HasPart ("hasPart"),
         HasPort ("hasPort"),
         IsConnectedTo("isConnectedTo");
 

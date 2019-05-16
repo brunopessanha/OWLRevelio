@@ -1,7 +1,9 @@
 package com.github.brunopessanha.revelio.owl;
 
+import com.github.brunopessanha.revelio.Revelio;
 import com.github.brunopessanha.revelio.parser.Enums;
 import com.github.brunopessanha.revelio.parser.ISysMLParser;
+import com.github.brunopessanha.revelio.settings.RevelioSettings;
 import com.github.brunopessanha.revelio.sysML.*;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
@@ -27,17 +29,13 @@ public class OntologyCreator implements IOntologyCreator {
 
     private final Map<String, OWLIndividual> individuals;
 
-    private final String portClass;
-    private final String connectionClass;
-    private final String ontologyIRI;
+    private final RevelioSettings settings;
 
     private final ISysMLParser parser;
 
-    public OntologyCreator(String ontologyIRI, String portClass, String connectionClass, ISysMLParser parser) {
+    public OntologyCreator(RevelioSettings settings, ISysMLParser parser) {
         this.ontologyManager = OWLManager.createOWLOntologyManager();
-        this.ontologyIRI = ontologyIRI;
-        this.portClass = portClass;
-        this.connectionClass = connectionClass;
+        this.settings = settings;
         this.parser = parser;
         this.classAxioms = new ArrayList<>();
         this.objectPropertyAxioms = new ArrayList<>();
@@ -50,7 +48,7 @@ public class OntologyCreator implements IOntologyCreator {
     }
 
     private OWLObjectProperty getHasPartRelation() {
-        return dataFactory.getOWLObjectProperty(getIRI(Enums.Relation.HasPart.toString()));
+        return dataFactory.getOWLObjectProperty(getIRI(settings.getHasPartObjectProperty()));
     }
 
     private OWLObjectProperty getHasPortRelation() {
@@ -66,7 +64,7 @@ public class OntologyCreator implements IOntologyCreator {
     }
 
     private IRI getIRI(String name) {
-        return IRI.create(ontologyIRI, Util.trimAll(name));
+        return IRI.create(settings.getOntologyIRI(), Util.trimAll(name));
     }
 
     private OWLClass getOWLClass(String name) {
@@ -172,7 +170,7 @@ public class OntologyCreator implements IOntologyCreator {
     private void addBlockPortsAxioms(List<Port> ports, OWLClass block) {
         for (Port port : ports) {
             OWLClass owlParentClass = getOWLClass(port.getSuperClass().toString());
-            OWLClass owlPortClass = getOWLClass(portClass);
+            OWLClass owlPortClass = getOWLClass(settings.getPortClass());
             OWLClassExpression classExpression = dataFactory.getOWLObjectSomeValuesFrom(getHasPortRelation(), owlPortClass);
 
             getPortIndividual(port);
@@ -245,7 +243,7 @@ public class OntologyCreator implements IOntologyCreator {
                 individualAxioms.add(dataFactory.getOWLObjectPropertyAssertionAxiom(getIsConnectedToRelation(), connection, secondIndividual));
             }
 
-            individualAxioms.add(dataFactory.getOWLClassAssertionAxiom(getOWLClass(connectionClass), connection));
+            individualAxioms.add(dataFactory.getOWLClassAssertionAxiom(getOWLClass(settings.getConnectionClass()), connection));
         }
     }
 

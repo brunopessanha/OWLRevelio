@@ -1,5 +1,7 @@
 package com.github.brunopessanha.revelio.settings;
 
+import java.io.InputStream;
+
 public class RevelioSettings {
 
     private String filePath;
@@ -12,6 +14,10 @@ public class RevelioSettings {
 
     private String connectionClass;
 
+    private InputStream inputStream;
+
+    private String hasPartObjectProperty;
+
     /**
      * Create a new Revelio Settings instance with default values for Part and Port classes
      */
@@ -19,6 +25,7 @@ public class RevelioSettings {
         this.partClass = "Part";
         this.portClass = "Port";
         this.connectionClass =  "Connection";
+        this.hasPartObjectProperty = "hasPart";
     }
 
     /**
@@ -28,6 +35,31 @@ public class RevelioSettings {
         this();
         this.filePath = filePath;
         this.ontologyIRI = ontologyIRI;
+    }
+
+    /**
+     * Create a new Revelio Settings instance with default values for Part and Port classes and custom Has Part object property
+     */
+    public RevelioSettings(String filePath, String ontologyIRI, String hasPartObjectProperty) {
+        this(filePath, ontologyIRI);
+        this.hasPartObjectProperty = hasPartObjectProperty;
+    }
+
+    /**
+     * Create a new Revelio Settings instance with default values for Part and Port classes and Has Part object property
+     */
+    public RevelioSettings(InputStream inputStream, String ontologyIRI) {
+        this();
+        this.inputStream = inputStream;
+        this.ontologyIRI = ontologyIRI;
+    }
+
+    /**
+     * Create a new Revelio Settings instance with default values for Part and Port classes and custom Has Part object property
+     */
+    public RevelioSettings(InputStream inputStream, String ontologyIRI, String hasPartObjectProperty) {
+        this(inputStream, ontologyIRI);
+        this.hasPartObjectProperty = hasPartObjectProperty;
     }
 
     /**
@@ -81,4 +113,19 @@ public class RevelioSettings {
         return filePath;
     }
 
+    /**
+     * SysML file input stream
+     * @return file input stream
+     */
+    public InputStream getInputStream() {
+        return inputStream;
+    }
+
+    /**
+     * The name of the object property for has part relation
+     * @return name of has part object property
+     */
+    public String getHasPartObjectProperty() {
+        return hasPartObjectProperty;
+    }
 }

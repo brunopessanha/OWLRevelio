@@ -9,6 +9,7 @@ import com.github.brunopessanha.revelio.parser.SysMLParser;
 import com.github.brunopessanha.revelio.settings.RevelioSettings;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.stream.Stream;
 
 public class Revelio {
@@ -23,10 +24,11 @@ public class Revelio {
      * @throws InvalidSysMLFileException
      */
     public Revelio(RevelioSettings settings) throws InvalidSysMLFileException {
-        this.parser = new SysMLParser(settings.getFilePath(), settings.getPartClass());
+
+        this.parser = new SysMLParser(settings);
         this.parser.parse();
 
-        this.ontologyManager = new OntologyCreator(settings.getOntologyIRI(), settings.getPortClass(), settings.getConnectionClass(), parser);
+        this.ontologyManager = new OntologyCreator(settings, parser);
         this.ontologyManager.generateAxioms();
     }
 
@@ -38,6 +40,16 @@ public class Revelio {
      */
     public Revelio(String filePath, String ontologyIRI) throws InvalidSysMLFileException {
         this(new RevelioSettings(filePath, ontologyIRI));
+    }
+
+    /**
+     * Create a new instance of Revelio which will parse a SysML file and generate OWL axioms
+     * @param inputStream the input stream of the SysML file
+     * @param ontologyIRI the IRI for the generated ontology
+     * @throws InvalidSysMLFileException
+     */
+    public Revelio(InputStream inputStream, String ontologyIRI) throws InvalidSysMLFileException {
+        this(new RevelioSettings(inputStream, ontologyIRI));
     }
 
     /**

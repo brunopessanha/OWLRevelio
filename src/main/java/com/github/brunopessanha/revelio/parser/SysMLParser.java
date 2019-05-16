@@ -1,6 +1,7 @@
 package com.github.brunopessanha.revelio.parser;
 
 import com.github.brunopessanha.revelio.exceptions.InvalidSysMLFileException;
+import com.github.brunopessanha.revelio.settings.RevelioSettings;
 import com.github.brunopessanha.revelio.sysML.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -27,23 +28,28 @@ public class SysMLParser implements ISysMLParser {
     private List<Association> associations;
     private Document doc;
 
-    public SysMLParser(String filePath, String rootClass) throws InvalidSysMLFileException {
+    public SysMLParser(RevelioSettings settings) throws InvalidSysMLFileException {
 
         this.associations = new ArrayList<>();
         this.attributeMap = new HashMap<>();
 
         try {
 
-            File file = new File(filePath);
             DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            this.doc = dBuilder.parse(file);
+
+            if (settings.getFilePath() != null) {
+                File file = new File(settings.getFilePath());
+                this.doc = dBuilder.parse(file);
+            } else {
+                this.doc = dBuilder.parse(settings.getInputStream());
+            }
 
             if (!doc.getDocumentElement().getNodeName().equals(Enums.XML_Tag.XMI.toString())) {
                 throw new InvalidSysMLFileException("The file provided is not a valid XMI file.");
             }
 
             blockMap = parseNodesByTag(doc, Enums.XML_Tag.BlockDiagram.toString()).stream()
-                    .map(t -> new Block(t.getBase(), rootClass)).collect(Collectors.toMap(Block::getId, block -> block));
+                    .map(t -> new Block(t.getBase(), settings.getPartClass())).collect(Collectors.toMap(Block::getId, block -> block));
 
             portMap = parseNodesByTag(doc, Enums.XML_Tag.FullPort.toString()).stream()
                     .map(t -> new Port(t.getBase(), Enums.Port.FullPort)).collect(Collectors.toMap(Port::getId, port -> port));

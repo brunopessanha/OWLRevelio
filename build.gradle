@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.github.brunopessanha'
-version '1.0-SNAPSHOT'
+version '1.0.3'
 
 sourceCompatibility = 1.9
 
@@ -44,9 +44,9 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             customizePom(pom)
-            groupId 'com.github.brunopessanha'
+            groupId group
             artifactId 'revelio'
-            version '1.0.1'
+            version version
 
             from components.java
 
@@ -132,6 +132,7 @@ def customizePom(pom) {
             developers {
                 developer {
                     name 'Bruno Pessanha'
+                    email 'brunopdec@gmail.com'
                 }
             }
         }
