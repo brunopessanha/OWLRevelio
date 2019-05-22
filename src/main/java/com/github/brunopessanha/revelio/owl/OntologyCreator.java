@@ -1,13 +1,12 @@
 package com.github.brunopessanha.revelio.owl;
 
-import com.github.brunopessanha.revelio.Revelio;
 import com.github.brunopessanha.revelio.parser.Enums;
 import com.github.brunopessanha.revelio.parser.ISysMLParser;
+import com.github.brunopessanha.revelio.parser.Util;
 import com.github.brunopessanha.revelio.settings.RevelioSettings;
 import com.github.brunopessanha.revelio.sysML.*;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
-import com.github.brunopessanha.revelio.parser.Util;
 
 import java.io.File;
 import java.util.ArrayList;
